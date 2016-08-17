@@ -1,6 +1,6 @@
 # Improving the Delite Experience 
 
-![Simple Graph](http://localhost:9000/g/png?
+![Simple Graph](https://www.dotty.ch/g/png?
 digraph G {
   rankdir=BT;
   A [color=gray,style=filled];
