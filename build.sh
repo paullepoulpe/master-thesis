@@ -44,7 +44,7 @@ fi
 #       --filter pandoc-citeproc.) If --natbib or --biblatex is also supplied,
 #       pandoc-citeproc is not used, making this equivalent to --metadata
 #       bibliography=FILE. If you supply this argument multiple times, each FILE
-#       will be added to bibliography.a
+#       will be added to bibliography.
 
 #  --biblatex
 #       Use biblatex for citations in LaTeX output. This option is not for use
@@ -60,11 +60,28 @@ fi
 #       option for geometry package, e.g. margin=1in; may be repeated for
 #       multiple options
 
-pandoc -f markdown -t latex "$SRC_FOLDER"/*.md \
-  --number-sections \
-  --toc \
-  --variable=geometry:a4paper \
-  -o "$BUILD_FOLDER/thesis.pdf" 
+
+# Concatenate all files with space in between
+rm "$BUILD_FOLDER/thesis.md"
+for f in "$SRC_FOLDER"/*.md; do 
+  cat "${f}"; echo
+done >> "$BUILD_FOLDER/thesis.md";
+
+# Generate both pdf and tex (for inspection)
+PDF="$BUILD_FOLDER/thesis.pdf"
+TEX="$BUILD_FOLDER/thesis.tex"
+
+for outfile in "$PDF" "$TEX"; do
+  echo "Compiling thesis to $outfile ..."
+  cat "$BUILD_FOLDER/thesis.md" |\
+  sed -e "s%/g/png%/g/pdf%" |\
+  pandoc -f markdown -t latex \
+    --number-sections \
+    --default-image-extension=pdf \
+    --toc \
+    --variable=geometry:a4paper \
+    -o $outfile
+done
 
 if [ "$1" = "--open" ]; then
   open "$BUILD_FOLDER/thesis.pdf"
