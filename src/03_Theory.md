@@ -1,6 +1,11 @@
-# Background
+# The Delite Compiler Architecture
+Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). It can the be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) and run on heterogenous architectures (CPU /GPU). 
 
-## LMS
+## Motivation
+
+
+## Lightweight Modular staging
+
 
 ## Delite
 
@@ -10,7 +15,7 @@
 
 #### Elems
 
-![Delite Elems Hierarchy](http://www.dotty.ch/g/png?
+![Delite Elems Hierarchy](https://www.dotty.ch/g/png?
   digraph G {
     rankdir=BT;
     Def [shape=box,color=gray,style=filled];

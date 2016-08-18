@@ -10,7 +10,7 @@ if [ ! -d "$BUILD" ]; then
 fi
 
 # Concatenate all files with space in between
-rm "$BUILD/thesis.md"
+rm -f "$BUILD/thesis.md"
 for f in "$SRC"/*.md; do 
   cat "${f}"; echo
 done >> "$BUILD/thesis.md";
@@ -24,13 +24,16 @@ for outfile in "$PDF" "$TEX"; do
   cat "$BUILD/thesis.md" |\
   sed -e "s%/g/png%/g/pdf%" |\
   pandoc -f markdown -t latex \
+    --smart \
     --template="$TEMPLATES/default.latex" \
     --standalone \
     --number-sections \
     --default-image-extension=pdf \
     --toc \
+    --filter pandoc-citeproc \
+    --bibliography="$SRC/biblio.bib" \
+    --csl "$TEMPLATES/computer.csl" \
     -V fontsize=12pt \
-    --variable=documentclass:memoir \
     --variable=geometry:a4paper \
     -o $outfile
 done

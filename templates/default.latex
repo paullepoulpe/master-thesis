@@ -194,7 +194,7 @@ $endfor$
 
 \begin{document}
 
-\begin{titlingpage}
+\begin{titlepage}
 \begin{center}
 \Large
 \textbf{École Polytechnique Fédérale de Lausanne}
@@ -234,7 +234,7 @@ LAMP | EPFL                     \hfill    PPL | Stanford \\
 \hfill
 \includegraphics[width=0.4\textwidth]{images/stanford-logo.eps}
 
-\end{titlingpage}
+\end{titlepage}
 
 $if(abstract)$
 \begin{abstract}
