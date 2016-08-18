@@ -1,4 +1,4 @@
-\documentclass[titlepage$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
+\documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
 $if(fontfamily)$
 \usepackage[$for(fontfamilyoptions)$$fontfamilyoptions$$sep$,$endfor$]{$fontfamily$}
 $else$
@@ -197,7 +197,7 @@ $endfor$
 \begin{titlingpage}
 \begin{center}
 \Large
-\textbf{Ecole Polytechnique Fédérale de Lausanne}
+\textbf{École Polytechnique Fédérale de Lausanne}
 
 \vspace{1cm}
 

@@ -29,6 +29,7 @@ for outfile in "$PDF" "$TEX"; do
     --number-sections \
     --default-image-extension=pdf \
     --toc \
+    -V fontsize=12pt \
     --variable=documentclass:memoir \
     --variable=geometry:a4paper \
     -o $outfile
