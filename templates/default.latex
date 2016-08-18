@@ -205,10 +205,12 @@ Master Thesis
 
 \vspace{2cm}
 
-\hrulefill \\
+\hrule
+\vspace{1cm}
 \Huge
 \textbf{Finding an awesome title for a Master Thesis} \\
-\hrulefill \\
+\vspace{1cm}
+\hrule
 
 \end{center}
 

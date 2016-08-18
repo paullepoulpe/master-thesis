@@ -1,2 +1,5 @@
-#output directory
+# output directory
 build/
+
+# Converted images 
+images/*converted-to*
