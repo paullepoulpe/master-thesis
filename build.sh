@@ -12,10 +12,10 @@ fi
 # Spell check the files
 if [ "$1" = "spellcheck" ]; then
   # Run interactive mode to fix spelling mistakes
-  mdspell --ignore-acronyms --dictionary "$TEMPLATES/words" "$SRC/*.md" || exit 1
+  mdspell --ignore-acronyms --en-us "$SRC/*.md" || exit 1
 else
   # By default only run in batch mode
-  mdspell --report --ignore-acronyms --dictionary "$TEMPLATES/words" "$SRC/*.md" || exit 1
+  mdspell --report --ignore-acronyms --en-us "$SRC/*.md" || exit 1
 fi
 
 # Concatenate all files with space in between
