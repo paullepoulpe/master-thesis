@@ -20,7 +20,7 @@ PDF="$BUILD/thesis.pdf"
 TEX="$BUILD/thesis.tex"
 
 for outfile in "$PDF" "$TEX"; do
-  echo "Compiling thesis to $outfile ..."
+  echo -n "Compiling thesis to $outfile ..."
   cat "$BUILD/thesis.md" |\
   sed -e "s%/g/png%/g/pdf%" |\
   pandoc -f markdown -t latex \
@@ -36,6 +36,7 @@ for outfile in "$PDF" "$TEX"; do
     -V fontsize=12pt \
     --variable=geometry:a4paper \
     -o $outfile
+  echo " Done !"
 done
 
 if [ "$1" = "--open" ]; then
