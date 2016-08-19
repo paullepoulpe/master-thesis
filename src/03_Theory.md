@@ -1,5 +1,5 @@
 # The Delite Compiler Architecture
-Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). It can the be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) and run on heterogenous architectures (CPU /GPU). 
+Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). It can the be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) and run on heterogeneous architectures (CPU /GPU). 
 
 ## Motivation
 
@@ -73,7 +73,7 @@ abstract class DeliteOpLoop[A] extends AbstractLoop[A] with DeliteOp[A] {
 }
 ```
 
-### Elems
+###  
 
 ![Delite Elems Hierarchy](https://www.dotty.ch/g/png?
   digraph G {

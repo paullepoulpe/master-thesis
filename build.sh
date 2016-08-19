@@ -9,10 +9,19 @@ if [ ! -d "$BUILD" ]; then
   mkdir "$BUILD"
 fi
 
+# Spell check the files
+if [ "$1" = "spellcheck" ]; then
+  # Run interactive mode to fix spelling mistakes
+  mdspell --ignore-acronyms --dictionary "$TEMPLATES/words" "$SRC/*.md" || exit 1
+else
+  # By default only run in batch mode
+  mdspell --report --ignore-acronyms --dictionary "$TEMPLATES/words" "$SRC/*.md" || exit 1
+fi
+
 # Concatenate all files with space in between
 rm -f "$BUILD/thesis.md"
 for f in "$SRC"/*.md; do 
-  cat "${f}"; echo
+  cat "${f}"; echo; echo;
 done >> "$BUILD/thesis.md";
 
 # Generate both pdf and tex (for inspection)

@@ -3,3 +3,6 @@ build/
 
 # Converted images 
 images/*converted-to*
+
+# Temp files
+.*.swp
