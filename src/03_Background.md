@@ -1,12 +1,6 @@
 # The Delite Compiler Architecture
 Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). It can the be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) and run on heterogeneous architectures (CPU /GPU). 
 
-## Motivation
-
-??? TODO: Do i really want to keep this ???
-
-If so say something about separation of concerns ( platform vs domain knowledge )
-
 ## Lightweight Modular Staging
 Delite uses LMS (or Lightweight Modular Staging [@lms]) to lift user programs written in plain scala to an intermediate representation that can then be staged to produce more efficient code. It also defines all of the base architecture for analysis and transformation passes.
 
@@ -53,7 +47,7 @@ Delite provides code generators from each of these patterns to multiple platform
 
 ### Implementation
 
-The way delite is designed
+The way delite is designed is using parallel loops that process `DeliteCollection`s. Each loop has a size, a loop index as well as a loop body. The loop size may refer to another collection. and the loop body is an arbitrary definition representing the result of the loop computation.
 
 ```scala
 abstract class AbstractLoop[A] extends Def[A] with CanBeFused {
@@ -73,7 +67,8 @@ abstract class DeliteOpLoop[A] extends AbstractLoop[A] with DeliteOp[A] {
 }
 ```
 
-###  
+Most of the `DeliteOp`s are loops, and define a `DeliteElem` as their body. A DSL author uses exclusively `DeliteOp`s to define operations. The Delite architecture then uses the corresponding `Elem`s to perform transformations.
+
 
 ![Delite Elems Hierarchy](https://www.dotty.ch/g/png?
   digraph G {
@@ -115,4 +110,55 @@ abstract class DeliteOpLoop[A] extends AbstractLoop[A] with DeliteOp[A] {
     DeliteForeachElem -> DeliteLoopElem;
   }
 )
+
+![Delite Loops hierarchy](http://www.dotty.ch/g/png?
+  digraph G {
+    rankdir=BT;
+    Def [shape=box,color=gray,style=filled];
+    ;
+    AbstractLoop [shape=box,color=gray,style=filled];
+    AbstractLoop -> Def;
+    ;
+    DeliteOp [shape=box,color=salmon,style=filled];
+    DeliteOp -> Def;
+    ;
+    DeliteOpLoop [shape=box,color=salmon,style=filled];
+    DeliteOpLoop -> AbstractLoop;
+    DeliteOpLoop -> DeliteOp;
+    ;
+    DeliteOpCollectLoop [shape=box,color=lightblue,style=filled];
+    DeliteOpCollectLoop -> DeliteOpLoop;
+    ;
+    DeliteOpFlatMapLike [shape=box,color=lightblue,style=filled];
+    DeliteOpFlatMapLike -> DeliteOpCollectLoop;
+    ;
+    DeliteOpFoldLike [shape=box,color=lightblue,style=filled];
+    DeliteOpFoldLike-> DeliteOpCollectLoop;
+    ;
+    DeliteOpReduceLike [shape=box,color=lightblue,style=filled];
+    DeliteOpReduceLike -> DeliteOpCollectLoop;
+    ;
+    DeliteOpForeach [shape=box,color=lightblue,style=filled]; 
+    DeliteOpForeach -> DeliteOpLoop
+    ;
+    DeliteOpHashCollectLike [shape=box,color=lightblue,style=filled];
+    DeliteOpHashCollectLike -> DeliteOpLoop;
+    ;  
+    DeliteOpHashReduceLike [shape=box,color=lightblue,style=filled];
+    DeliteOpHashReduceLike -> DeliteOpLoop;
+    ;
+    DeliteOpMapLike [shape=box,color=lightblue,style=filled];
+    DeliteOpMapLike -> DeliteOpFlatMapLike;
+    ;
+    DeliteOpMapI [shape=box,color=lightblue,style=filled];
+    DeliteOpMapI -> DeliteOpMapLike;
+    ;
+    DeliteOpFilterI [shape=box,color=lightblue,style=filled];
+    DeliteOpFilterI -> DeliteOpFlatMapLike;
+    ;
+    DeliteOpFlatMapI [shape=box,color=lightblue,style=filled];
+    DeliteOpFlatMapI -> DeliteOpFlatMapLike;
+  }
+)
+
 
