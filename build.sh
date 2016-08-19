@@ -10,10 +10,10 @@ if [ ! -d "$BUILD" ]; then
 fi
 
 # Spell check the files
-if [ "$1" = "spellcheck" ]; then
+if [ "$1" = "--spellcheck" ]; then
   # Run interactive mode to fix spelling mistakes
   mdspell --ignore-acronyms --en-us "$SRC/*.md" || exit 1
-else
+elif [ "$1" != "--nospellcheck" ]; then
   # By default only run in batch mode
   mdspell --report --ignore-acronyms --en-us "$SRC/*.md" || exit 1
 fi
