@@ -2,16 +2,6 @@
 
 ## Notes
 
-![Simple Graph](https://www.dotty.ch/g/png?
-digraph G {
-  rankdir=BT;
-  A [color=gray,style=filled];
-  B [shape=box,color=lightblue,style=filled];
-  B -> A;
-  C [shape=box,color=salmon,style=filled];
-  C -> A;
-})
-
 - background
 
 - introduction to lms
