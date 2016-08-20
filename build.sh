@@ -35,6 +35,7 @@ for outfile in "$PDF" "$TEX"; do
   pandoc -f markdown -t latex \
     --smart \
     --template="$TEMPLATES/default.latex" \
+    --reference-links \
     --standalone \
     --number-sections \
     --default-image-extension=pdf \

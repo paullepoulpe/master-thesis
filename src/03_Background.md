@@ -1,4 +1,5 @@
-# The Delite Compiler Architecture
+# Background
+<!-- The Delite Compiler Architecture -->
 Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). It can the be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) and run on heterogeneous architectures (CPU /GPU). 
 
 ## Lightweight Modular Staging
@@ -18,16 +19,63 @@ The IR lms is composed of the following basic blocks:
 
 During program evaluation, each definition is associated with a symbol, and that symbol is returned in place of the value for use in subsequent operations (see [@virtualization] & [@tagless] for the mechanism through which this is achieved). This allows LMS to perform automatic CSE on the IR as it can lookup if a definition has already been encountered previously and return the same symbol if it is the case.
 
-Each definition with it's symbol are represented as a typed pair (or TP) in LMS. The set of all the typed pairs represent the staged program.
+Each statement is represented as a typed pair (or TP) in LMS. A typed pair is composed of a definition and it's associated symbol. The set of all statements represent the staged program.
 
 The resulting program is the generated from the result value, resolving the transitive dependencies and then sorting them topologically to obtain a valid schedule than will produce the result (see [@betterfusion] for a detailed explanation).
+
+Here is a simple snippet of code
+
+```scala
+val x1 = x0 + 2
+val x2 = x1 > 13
+val x4 = if ( x2 ){
+  val x3 = x1 * 3
+  x3
+} else {
+  val x1bis = x0 + 2
+  x1bis
+}
+```
+
+And here is the resulting ast
+
+```scala
+TP(Sym(1), IntPlus(Sym(0), Const(2)))
+TP(Sym(2), OrderingGT(Sym(1), Const(13)))
+TP(Sym(3), IntTimes(Sym(1), Const(3)))
+TP(Sym(4), IfThenElse(Sym(2), Sym(3), Sym(1)))
+```
+
+As we can see, the computation for `x1` has not been duplicated for `x1bis` because it is the same, lms returned `Sym(1)` in the `IfThenElse` node.
+
+## Transformers and Mirroring
+As we've seen in the previous section, LMS can automatically perform generic optimization. For more specific optimizations, lms provides a transformation api.
+
+A transformer walks through a schedule and processes each statement to decide weather it has to be changed or not. Even when a statement is not modified by the transformer, it's dependencies might have been and that has to be reflected in the node. In LMS, this process is called mirroring.
+
+Since the AST is immutable, mirroring has to generate a new node with the updated dependencies. The mirroring function also has the opportunity to perform domain specific optimization when generating the node depending on changes made to the dependencies.
+
+## The Delite Pipeline
+
+Delite uses LMS to stage DSL programs and generate efficient code. A user program first goes through staging to obtain the AST. It then goes through a series of transformers until it can be fed into a code generator to obtain optimized Scala or C++ code.
+
+The main transformations performed by delite are :
+
+| Name                              | Description                                           |
+| --------------------------------- | ----------------------------------------------------- |
+| Device Independent Lowering       | Lowers DSL definitions into generic delite operations such as loop traversals |
+| Device Dependent Lowering         | Performs additional transforming specific to the  target platform |
+| `Multiloop SoA`                     | Or `ArrayOfStruct` to `StructofArray`. Splits loops generating arrays of structures into multiple loops (one for each field) | 
+| Vertical Loop Fusion              | Fuses producer and consumer loops together to eliminate intermediate data structures |
+| Horizontal Loop Fusion            | Fuses loops that iterate over the same range into the same loop | 
+
 
 ## Parallel Patterns
 
 ### Theory
 Delite operations are defined using collection of reusable parallel patterns. They are high level functional procedures that define how `DeliteCollection`s are used and transformed. `DeliteCollection`s are implemented by DSL authors and define the representation of the data. Each operation has very specific semantics and constraints the access pattern on the collection. This allows code generators and analysis to have a precise understanding of the semantics of the program and generate efficient code.
 
-There are 4 core operations defined in Delite [@eatperf]:
+There are four core operations defined in Delite [@eatperf]:
 
 ```scala
 Collect(c)(f)               : Coll[V]
@@ -161,4 +209,44 @@ Most of the `DeliteOp`s are loops, and define a `DeliteElem` as their body. A DS
   }
 )
 
+## Optimizations
 
+Data processing application deal with data that is structured in collection of records (`Array`s of `Struct`s). These collections are then queried to compute some information. Here is a toy example:
+
+```scala
+case class PeopleRecord(name: String, age: Int, 
+        height: Double, address: String)
+
+val population: Collection[PeopleRecord] = 
+        fromFile("pop.json").slurp[PeopleRecord]
+
+val heights = population    Where(_.age > 40)  
+                            Select(_.values.sum(_.height))
+```
+
+As is the case in the example above, most of these queries end up using only part of the information that is available in each element of the collection. When written in a functional way however, if implement in the naive way, the whole collection has to flow through all the intermediate operations until it is discarded by the final filter. This is unnecessary and causes potentially a lot of memory to be used for no reason. Furthermore if the collection is not local to the computation, the communication overhead can become significant. (TODO: citation needed)
+
+In this section, we present three optimizations that allow us trim the collection of the unused fields as soon as they are not needed. This will make the program use the strictly necessary data.
+
+### `ArrayOfStruct` to `StructofArray`
+Using lms records, Delite can introspect in the structure of the data that compose its collections. This allows us to perform `ArrayOfStruct` to `StructOfArray` transformations.
+
+This transformer iterates over all of the loops in the schedule that are generating collections of structures and replaces them with a collection of loops generating one field of the structure each. It then replaces all of the references to the original collection with a reference to the corresponding loop.
+
+This allows us to separate the fields from the original collection and remove dependencies between loops that access only one field the structure and the other fields.
+
+TODO: maybe example of result ?
+
+### Vertical Loop Fusion
+After `SoA` transformation, in the example above, we now have an array for the `address` field that is being created but never actually used. We also generate a `Collection[PeopleRecord]` that is never used for anything else than being consumed by the `Where` clause. Similarly the collection produced by the `Where` clause is immediately consumed by the `Select`.
+
+To avoid creating intermediate collections, Delite uses lms to perform vertical loop fusion where it merges together the bodies of the consumers in their producers. This results in one large loops that directly computes the `heights` result and allows the scheduler to remove all of the computation needed to compute the `address` field.
+
+TODO: maybe example of result ?
+
+### Horizontal Loop Fusion
+The problem with the previous two optimizations alone is that now we have a large number of loops that are potentially duplicating computation. If the elements of the original array shared some code, now this code is duplicate across all of the loops.
+
+To solve this problem we merge all of the loops iterating over the same range. All of the computation will thus be in the same scope and LMS's CSE optimization will take car of sharing the computation for all of the fields.
+
+TODO: maybe example of result ?
