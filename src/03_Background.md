@@ -12,7 +12,7 @@ The IR lms is composed of the following basic blocks:
 | `Exp[+T]`         | Atomic node representing an expression of type T          |
 | `Const[+T](x: T)` | Constant expression of type `T` (extends `Exp[T]`)        |
 | `Sym[+T](id: Int)`| Symbol of type `T` (extends `Exp[T]`)                     |
-| `Def[+T]`         | Composite node that is defined by a library or dsl author |
+| `Def[+T]`         | Composite node that is defined by a library or DSL author |
 
 
 `Exp[T]` is an interface that represents an expression of type `T`. Constants and symbols are the only elements implementing that interface. Composite operations are defined using `Def`s and can only reference symbols or constants.
@@ -21,7 +21,7 @@ During program evaluation, each definition is associated with a symbol, and that
 
 Each statement is represented as a typed pair (or TP) in LMS. A typed pair is composed of a definition and it's associated symbol. The set of all statements represent the staged program.
 
-The resulting program is the generated from the result value, resolving the transitive dependencies and then sorting them topologically to obtain a valid schedule than will produce the result (see [@betterfusion] for a detailed explanation).
+The resulting program is generated from the result value, resolving the transitive dependencies and then sorting them topologically to obtain a valid schedule that will produce the result (see [@betterfusion] for a detailed explanation).
 
 Here is a simple snippet of code
 
@@ -37,7 +37,7 @@ val x4 = if ( x2 ){
 }
 ```
 
-And here is the resulting ast
+And here is the resulting AST
 
 ```scala
 TP(Sym(1), IntPlus(Sym(0), Const(2)))
@@ -46,12 +46,12 @@ TP(Sym(3), IntTimes(Sym(1), Const(3)))
 TP(Sym(4), IfThenElse(Sym(2), Sym(3), Sym(1)))
 ```
 
-As we can see, the computation for `x1` has not been duplicated for `x1bis` because it is the same, lms returned `Sym(1)` in the `IfThenElse` node.
+As we can see, the computation for `x1` has not been duplicated for `x1bis` because it is the same, LMS returned `Sym(1)` in the `IfThenElse` node.
 
 ## Transformers and Mirroring
-As we've seen in the previous section, LMS can automatically perform generic optimization. For more specific optimizations, lms provides a transformation api.
+As we've seen in the previous section, LMS can automatically perform generic optimization. For more specific optimizations, LMS provides a transformation API.
 
-A transformer walks through a schedule and processes each statement to decide weather it has to be changed or not. Even when a statement is not modified by the transformer, it's dependencies might have been and that has to be reflected in the node. In LMS, this process is called mirroring.
+A transformer walks through a schedule and processes each statement to decide whether it has to be changed or not. Even when a statement is not modified by the transformer, it's dependencies might have been and that has to be reflected in the node. In LMS, this process is called mirroring.
 
 Since the AST is immutable, mirroring has to generate a new node with the updated dependencies. The mirroring function also has the opportunity to perform domain specific optimization when generating the node depending on changes made to the dependencies.
 
