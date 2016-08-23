@@ -1,5 +1,8 @@
 # Introduction
 
+-- History of programming
+
+
 Delite is a multi staging optimizing compiler architecture that takes high level domain specific language as input and produce high performance code for several different platform. Application programmers are most productive when they have access to the highest level of abstraction for their needs.
 
 Every abstraction has a cost however. Whether it is function calls or composite data, every abstraction adds structure to the program, and that structure can get in the way of the optimizer. Furthermore, due to the wide variety of computing platforms available today, to obtain maximum performance (whether pure or performance per Watt), the compiler has to be aware of the platform specific semantics so it can specialize the program to take advantage of these differences.
@@ -19,3 +22,4 @@ Our main contributions are:
  
  - Modify the delite architecture to integrate improvements made on the lms loop fusion
  - Improve the experience 
+
