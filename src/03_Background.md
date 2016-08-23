@@ -2,23 +2,18 @@
 
 ## Domain-specific languages
 
-A domain specific language (DSL), as opposed to a 
-<!---
-general purpose language (GSL), [SR: haha don't need abbrev if you never use it!]
--->
-general purpose language,
-provides a high level of abtraction to the programmer. As the name implies, it is composed of a series of constructs specific to a certain domain. This allows programmers to focus on their domain rather than the underlying implementation of the runtime. Due to their high level of abstraction DSL's carry an abundance of semantic information. Compilers can take advantage of that information to perform domain-specific optimizations and select the best representation for the executable depending on the specificity of the hardware target [@dsls].
+A domain specific language (DSL), as opposed to a general purpose language, provides a high level of abstraction to the programmer. As the name implies, a DSL is composed of a series of constructs specific to a certain domain. This allows programmers to focus on their domain rather than the underlying implementation of the runtime. Due to their high level of abstraction, DSL's carry an abundance of semantic information. Compilers can take advantage of that information to perform domain-specific optimizations and select the best representation for the executable depending on the specificity of the hardware target [@dsls].
 
 ## Multi-stage programming
 Multi stage-programming (MSP), or dynamic code generation, is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. MSP splits computations into stages distiguished from one another by frequency of execution or avalability of data. This allows evaluating part of the computations early or reducing frequency of execution of other parts. 
 
-Due to it's ability to strip abstraction and generate highly efficient code, MSP is especially well suited for performance oriented DSL compilation.
+Due to its ability to strip abstraction and generate highly efficient code, MSP is especially well suited for performance oriented DSL compilation.
 
 ## Parallel patterns
 
-Desgin patterns are a well understood concept in software engineering. They represent a general repeatable solution to a commonly occurring problem. More broadly they allow programmers to encapsulate semantics about some repeating strucured computation. Parallel patterns are no exceptions, they express structured computations in a parallel setting. Among the best known frameworks formalizing these patterns are MapReduce [@mapreduce] and Spark [@spark].
+Design patterns are a well understood concept in software engineering. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are MapReduce [@mapreduce] and Spark [@spark].
 
-Delite [@delite] uses the `MultiLoop` formalism (introduced in [@optistructs] & [@eatperf]). Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet `Coll[V]` represents the type of a collection with elements of type `V` and `Index` represents the type of the variable use to index the collection)
+Delite [@delite] uses the `MultiLoop` formalism introduced in [@optistructs] & [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Index` represents the type of the variable use to index the collection)
 
 ```scala
 Collect(c)(f)               : Coll[V]
@@ -35,12 +30,12 @@ r: (V, V) => V          // reduction function
 
 
 
- `DeliteCollection`s are implemented by DSL authors and define the representation of the data. Each operation has very specific semantics and constrains the access pattern on the collection. This allows code generators and analysers to have a precise understanding of the semantics of the program and generate efficient code.
+ `DeliteCollection`s are implemented by DSL authors and define the representation of the data. Each operation has very specific semantics and constrains the access pattern on the collection. This allows code generators and analyzers to have a precise understanding of the semantics of the program and generate efficient code.
 These patterns are then extended to implement more specific operations. For example `Collect` can be used to implement `Map` or `Filter`, and `Reduce` can be extended to `Fold` or `Sum`.
 
 ## Optimizations
 
-make the link with multiloops
+*TODO make the link with multiloops*
 
 Data processing applications deal with data that is structured in collections of records (`Array`s of `Struct`s). These collections are then queried to compute some information. Here is a toy example:
 
