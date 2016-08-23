@@ -59,7 +59,7 @@ Since the AST is immutable, mirroring has to generate a new node with the update
 
 Delite uses LMS to stage DSL programs and generate efficient code. A user program first goes through staging to obtain the AST. It then goes through a series of transformers until it can be fed into a code generator to obtain optimized Scala or C++ code.
 
-The main transformations performed by delite are :
+The main transformations performed by Delite are :
 
 | Name                              | Description                                           |
 | --------------------------------- | ----------------------------------------------------- |
@@ -73,7 +73,7 @@ The main transformations performed by delite are :
 ## Parallel Patterns
 
 ### Theory
-Delite operations are defined using collection of reusable parallel patterns. They are high level functional procedures that define how `DeliteCollection`s are used and transformed. `DeliteCollection`s are implemented by DSL authors and define the representation of the data. Each operation has very specific semantics and constraints the access pattern on the collection. This allows code generators and analysis to have a precise understanding of the semantics of the program and generate efficient code.
+Delite operations are defined using collection of reusable parallel patterns. They are high level functional procedures that define how `DeliteCollection`s are used and transformed. `DeliteCollection`s are implemented by DSL authors and define the representation of the data. Each operation has very specific semantics and constrains the access pattern on the collection. This allows code generators and analysers to have a precise understanding of the semantics of the program and generate efficient code.
 
 There are four core operations defined in Delite [@eatperf]:
 
