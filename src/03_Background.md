@@ -13,7 +13,7 @@ Due to its ability to strip abstraction and generate highly efficient code, MSP 
 
 Design patterns are a well understood concept in software engineering. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are MapReduce [@mapreduce] and Spark [@spark].
 
-Delite [@delite] uses the `MultiLoop` formalism introduced in [@optistructs] & [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Index` represents the type of the variable use to index the collection)
+Delite [@delite] uses the `MultiLoop` formalism introduced in prior work [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Index` represents the type of the variable use to index the collection)
 
 ```scala
 Collect(c)(f)               : Coll[V]
@@ -50,22 +50,22 @@ val heights = population    Where(_.age > 40)
                             Select(_.values.sum(_.height))
 ```
 
-As is the case in the example above, most of these queries end up using only part of the information that is available in each element of the collection. When written in a functional way however, if implemented in the naive way, the whole collection has to flow through all the intermediate operations until it is discarded by the final filter. This is unnecessary and causes potentially a lot of memory to be used for no reason. Furthermore if the collection is not local to the computation, the communication overhead can become significant. (TODO: citation needed)
+As is the case in the example above, most of these queries end up using only part of the information that is available in a given element of the collection. When written functionally, however, and implemented in the naive way, the whole collection has to flow through all the intermediate operations until it is discarded by the final filter. This is unnecessary and causes potentially a lot of memory to be used for no reason. Furthermore if the collection is not local to the computation, the communication overhead can become significant. (TODO: citation needed)
 
 In this section, we present three optimizations that allow us trim the collection of the unused fields as soon as they are not needed. This will make the program use the strictly necessary data.
 
 ### `ArrayOfStruct` to `StructofArray`
-Using LMS records, Delite can introspect in the structure of the data that compose its collections. This allows us to perform `ArrayOfStruct` to `StructOfArray` transformations.
+Using LMS records, Delite can introspect in the structure of the data that composes its collections. This allows us to perform `ArrayOfStruct` to `StructOfArray` or `SoA` transformations.
 
-This transformer iterates over all of the loops in the schedule that are generating collections of structures, and replaces them with a collection of loops generating one field of the structure each. It then replaces all of the references to the original collection with a reference to the corresponding loop.
+This transform iterates over all of the loops in the schedule that are generating collections of structures, and replaces them with a collection of loops generating one field of the structure each. It then replaces all references to the original collection with a reference to the corresponding loop.
 
 This allows us to separate the fields from the original collection and remove dependencies between loops that access only one field the structure and the other fields.
-*[SR: Maybe you should rewrite the second half of that sentence...]*
+*[SR: Maybe you should rewrite the second half of that sentence...do you mean to say "...remove dependencies between loops that access only one field of the structure and loops [or? operations?] that access the other fields]*
 
 TODO: maybe example of result ?
 
 ### Vertical Loop Fusion
-After `SoA` transformation, in the example above, we now have an array for the `address` field that is being created but never actually used. We also generate a `Collection[PeopleRecord]` that is never used for anything else than being consumed by the `Where` clause. Similarly the collection produced by the `Where` clause is immediately consumed by the `Select`.
+After the `SoA` transformation in the example above, we now have an array for the `address` field that is being created but never actually used. We also generate a `Collection[PeopleRecord]` that is never used for anything else than being consumed by the `Where` clause. Similarly the collection produced by the `Where` clause is immediately consumed by the `Select`.
 
 To avoid creating intermediate collections, Delite uses LMS to perform vertical loop fusion where it merges together the bodies of the consumers in their producers. This results in one large loop that directly computes the `heights` result and allows the scheduler to remove all of the computation needed to compute the `address` field.
 
