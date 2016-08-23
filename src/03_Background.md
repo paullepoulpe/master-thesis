@@ -3,7 +3,7 @@
 Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). It can then be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) and run on heterogeneous architectures (CPU /GPU). 
 
 ## Lightweight Modular Staging // put in implementation for details
-Delite uses LMS (or Lightweight Modular Staging [@lms]) to lift user programs written in plain scala to an intermediate representation that can then be staged to produce more efficient code. It also defines all of the base architecture for analysis and transformation passes.
+Delite uses LMS (or Lightweight Modular Staging [@lms]) to lift user programs written in plain Scala to an intermediate representation that can then be staged to produce more efficient code. It also defines all of the base architecture for analysis and transformation passes.
 
 The IR lms is composed of the following basic blocks:
 
