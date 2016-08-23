@@ -1,4 +1,6 @@
 \documentclass[$if(fontsize)$$fontsize$,$endif$$if(lang)$$babel-lang$,$endif$$if(papersize)$$papersize$paper,$endif$$for(classoption)$$classoption$$sep$,$endfor$]{$documentclass$}
+\usepackage{titlesec}
+\newcommand{\sectionbreak}{\clearpage}
 $if(fontfamily)$
 \usepackage[$for(fontfamilyoptions)$$fontfamilyoptions$$sep$,$endfor$]{$fontfamily$}
 $else$
@@ -191,7 +193,6 @@ $for(header-includes)$
 $header-includes$
 $endfor$
 
-
 \begin{document}
 
 \begin{titlepage}
@@ -261,6 +262,7 @@ $endif$
 $if(lof)$
 \listoffigures
 $endif$
+\newpage
 $body$
 
 $if(natbib)$
