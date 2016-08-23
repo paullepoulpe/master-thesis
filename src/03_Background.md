@@ -60,7 +60,8 @@ Using LMS records, Delite can introspect in the structure of the data that compo
 This transform iterates over all of the loops in the schedule that are generating collections of structures, and replaces them with a collection of loops generating one field of the structure each. It then replaces all references to the original collection with a reference to the corresponding loop.
 
 This allows us to separate the fields from the original collection and remove dependencies between loops that access only one field the structure and the other fields.
-*[SR: Maybe you should rewrite the second half of that sentence...do you mean to say "...remove dependencies between loops that access only one field of the structure and loops [or? operations?] that access the other fields]*
+
+*[SR: Maybe you should rewrite the second half of that last sentence...do you mean to say "...remove dependencies between loops that access only one field of the structure and loops [or operations] that access the other fields."]*
 
 TODO: maybe example of result ?
 
