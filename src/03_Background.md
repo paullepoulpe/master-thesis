@@ -214,7 +214,7 @@ Most of the `DeliteOp`s are loops, and define a `DeliteElem` as their body. A DS
 
 ## Optimizations
 
-Data processing application deal with data that is structured in collection of records (`Array`s of `Struct`s). These collections are then queried to compute some information. Here is a toy example:
+Data processing applications deal with data that is structured in collections of records (`Array`s of `Struct`s). These collections are then queried to compute some information. Here is a toy example:
 
 ```scala
 case class PeopleRecord(name: String, age: Int, 
