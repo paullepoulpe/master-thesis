@@ -65,6 +65,8 @@ This allows us to separate the fields from the original collection and remove de
 
 TODO: maybe example of result ?
 
+*[SR: Yes I think an example might be nice; either code if it's simple and/or a diagram showing the three transformations...either three separate diagrams or a single diagram showing the three phases, either one would work.]*
+
 ### Vertical Loop Fusion
 After the `SoA` transformation in the example above, we now have an array for the `address` field that is being created but never actually used. We also generate a `Collection[PeopleRecord]` that is never used for anything else than being consumed by the `Where` clause. Similarly the collection produced by the `Where` clause is immediately consumed by the `Select`.
 
@@ -78,3 +80,5 @@ The problem with the previous two optimizations alone is that now we have a larg
 To solve this problem we merge all of the loops iterating over the same range. All of the computation will thus be in the same scope and LMS's CSE optimization will take care of sharing the computation for all of the fields.
 
 TODO: maybe example of result ?
+
+*[SR: Background section looks excellent!  You may or may not want a transition paragraph here at the end, preapring the reader for what comes next e.g. something like "Next we will discuss in more detail specifically how we implemented these optimizations in the context of our system, the problems we encountered and the toosl we built to attack those problems blah blah bla... :) ]*
