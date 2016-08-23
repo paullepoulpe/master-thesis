@@ -1,25 +1,19 @@
 # Introduction
 
--- History of programming
+The modern programming landscape is significantly different than 20 years ago. When the first C standard was published in 1989, it was safe to assume the target platform had a single core cpu and some limited amount of memory that can be uniformly accessed. Thanks to Moore's law, every two years roughly, the program would run twice as fast by just updating the hardware. It is thus understandable that this model survived for such a long time. On the software side, abstraction was low too, because memory was scarce, programs (as well as compilers) had a limit on how complex they could be, thus limiting the need for abstraction.
 
+Since the turn of the 21st and with the slowdown in Moore's law, these assumtion are becoming less valid by the day. As  platforms get more complex and specialize, the hardware scene has become very heterogenous. Many computers contain several processors that are spread across multiple sockets. Non-uniform memory access architectures become the standard as machines scale out. Graphical processing units have gone from simple graphical accellerators in commercial computers to high performance clusters running complex machine learning applications.
 
-Delite is a multi staging optimizing compiler architecture that takes high level domain specific language as input and produce high performance code for several different platform. Application programmers are most productive when they have access to the highest level of abstraction for their needs.
+Computers are programmed to run increasingly complex task and process more memory than ever. While productivity is important to not waste the programmer's precious time, it is also essential to maximize performance by efficiently utilizing the available hardware ressources. Due to the large variety of platforms and associated programming models used to efficiently utilize them, the latter is usually a barrier for the former.
 
-Every abstraction has a cost however. Whether it is function calls or composite data, every abstraction adds structure to the program, and that structure can get in the way of the optimizer. Furthermore, due to the wide variety of computing platforms available today, to obtain maximum performance (whether pure or performance per Watt), the compiler has to be aware of the platform specific semantics so it can specialize the program to take advantage of these differences.
+What we need is a programming model that enables the programmer to use all the abstraction he needs while still maximizing hardware utilization. However, every abstraction has a cost. Whether it is collection operations or data structure, every abstraction adds complexity to the program, and that complexity can get in the way of the optimizer.
 
-Staging is a powerful and scalable solution that can be used to automatically strip abstraction from the program being staged and enable generic optimization to take place, making the resulting program as efficient as possible.
+Staging is a powerful and scalable solution that can be used to automatically strip abstraction from the program being staged and enable generic optimizations to take place, making the resulting program as efficient as possible. Staging alone is not sufficient though. Every modern programming language in use allows users to define loops of arbitrary sizes. It is therefore not possible to inline the entire program into one binary containing no branches nor function calls. There is a minimal necessary complexity in the program that we cannot get rid of. Additionally, if we want to perform distributed computations for example, there are some optimization that cannot be performed statically but have to be handled by the runtime. Because of these reasons, it becomes obvious the compiler needs to be aware of that structure and work around it. Specifically it must be able to reason about loops and access to structured data.
 
-Staging alone is not sufficient though. Every modern programming language in use allows users to define loops of arbitrary sizes. It is therefore not possible to inline the entire program into one binary containing no branches nor function calls. There is a minimal necessary structure in the program that we cannot get rid of. Additionally, if we want to perform distributed computations for example, there are some optimization that cannot be performed statically but have to be handled by the runtime.
+Delite [@delite] is a multi staging optimizing compiler architecture that can take high-level programs and generate efficient low-level code that run on different platforms. The programmer's interface into the framework is made of domain specific languages (DSL). It provides utilities for dsl authors to express domain specific optimizations, but it also comes with a set of generic transformer for optimizing datastrucutres.
 
-Because of these reasons, it becomes obvious the compiler needs to be aware of that structure and work around it. Specifically it must be able to reason about loops and access to structured data. In this report, we present two major optimizations that allow Delite to achieve the highest performance it can.
+LMS (Lightweight Modular Staging) is the library Delite relies on to lift user programs, transform the intermediate representation and generate code. It provides more generic optimizations such as CSE (common subexpression elimination), DCE (dead code elimination) and loop fusion.
 
-TODO: explain why loop fusion didn't work and had to be changed, and why that required a change to the delite ops
+Recent work [@betterfusion] done on lms update the loop fusion optimization to get rid of several limitations that it had. Because of incopatible changes, Delite was however not able to profit from those updates and was stuck with the old version.
 
-TODO: explain the problem with staging programs and how they are a pain to debug (find funny examples)
-
-
-Our main contributions are:
- 
- - Modify the delite architecture to integrate improvements made on the lms loop fusion
- - Improve the experience 
-
+In this work we present the changes that had to be made in the design of the Delite framework to integrate this new optimization. During this redesign we also discovered some original problems that can occur by working on a staging compiler. We realized that there was a need for better tooling associated with this new kind of architecture. We present a few ideas and prototypes that can be used to address this need.
