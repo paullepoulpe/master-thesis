@@ -76,6 +76,7 @@ The main transformations performed by Delite are :
 Delite operations are defined using collection of reusable parallel patterns. They are high level functional procedures that define how `DeliteCollection`s are used and transformed. `DeliteCollection`s are implemented by DSL authors and define the representation of the data. Each operation has very specific semantics and constrains the access pattern on the collection. This allows code generators and analysers to have a precise understanding of the semantics of the program and generate efficient code.
 
 There are four core operations defined in Delite [@eatperf]:
+*[SR: table might need just a little more explanation e.g. what is "Coll[V]" etc. in column 2?]*
 
 ```scala
 Collect(c)(f)               : Coll[V]
@@ -95,7 +96,9 @@ Delite provides code generators from each of these patterns to multiple platform
 
 ### Implementation
 
-The way delite is designed is using parallel loops that process `DeliteCollection`s. Each loop has a size, a loop index as well as a loop body. The loop size may refer to another collection. and the loop body is an arbitrary definition representing the result of the loop computation.
+Delite uses 
+*[or, "Delite is designed using"]* 
+parallel loops that process `DeliteCollection`s. Each loop has a size and a loop index as well as a loop body. The loop size may refer to another collection, and the loop body is an arbitrary definition representing the result of the loop computation.
 
 ```scala
 abstract class AbstractLoop[A] extends Def[A] with CanBeFused {
