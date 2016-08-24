@@ -1,30 +1,32 @@
-# Implementation
+# Lightweight Modular Staging
+To explain the design of the Delite framework, we first have to take a step back and explain the inner workings of LMS. This section explains in detail the intermediate representation (IR) that LMS uses to model computations. We also briefly explain the mechanism that used to create to lift program into IR as well as the interface used to express IR transformations.
 
-<!-- The Delite Compiler Architecture -->
-Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). It can then be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) and run on heterogeneous architectures (CPU /GPU). 
+## Sea of Nodes
+The format that LMS uses [@lms] for it's IR is based on expression trees and single static assignments (SSA). More exactly, it uses what is called a "sea of nodes" representaiton. 
 
-## Lightweight Modular Staging // put in implementation for details
-Delite uses LMS (or Lightweight Modular Staging [@lms]) to lift user programs written in plain Scala to an intermediate representation that can then be staged to produce more efficient code. It also defines all of the base architecture for analysis and transformation passes.
+The IR is composed of a collection of statements, or typed pair (TP). Every pair contains a symbol and a definition. A symbol is a simple reference to the statement it defines. Definitions are used to express how expressions can be combined. Expressions are restricted to symbols and constants. The typing information is expressed using scala's type system and in a typeclass within each symbol.
 
-The IR lms is composed of the following basic blocks:
+Here is a summary of the types used in the IR:
 
-| Type              | Explanation                                               |
-| ----------------- | --------------------------------------------------------- |
-| `Exp[+T]`         | Atomic node representing an expression of type T          |
-| `Const[+T](x: T)` | Constant expression of type `T` (extends `Exp[T]`)        |
-| `Sym[+T](id: Int)`| Symbol of type `T` (extends `Exp[T]`)                     |
-| `Def[+T]`         | Composite node that is defined by a library or DSL author |
+```scala
+trait Exp[+T]
+
+// Constant expression of type T
+case class Const[T](x: T) extends Exp[T]
+// Symbol referencing a definition of type T        
+case class Sym[T](id: Int) extends Exp[T]  
+
+// Composite node that is defined by a library or DSL author
+trait Def[+T]
+
+// Statement in the IR
+case class TP[+T](sym: Sym[T], rhs: Def[T])
+```
 
 
-`Exp[T]` is an interface that represents an expression of type `T`. Constants and symbols are the only elements implementing that interface. Composite operations are defined using `Def`s and can only reference symbols or constants.
+`Exp[T]` is an interface that represents an expression of type `T`. Constants and symbols are the only elements implementing that interface. Composite operations are defined using `Def`s and can only reference symbols or constants. All the symbols that are referenced by a definition are called it's dependencies and get be queried through the `syms` function.
 
-During program evaluation, each definition is associated with a symbol, and that symbol is returned in place of the value for use in subsequent operations (see [@virtualization] & [@tagless] for the mechanism through which this is achieved). This allows LMS to perform automatic CSE on the IR as it can lookup if a definition has already been encountered previously and return the same symbol if it is the case.
-
-Each statement is represented as a typed pair (or TP) in LMS. A typed pair is composed of a definition and it's associated symbol. The set of all statements represent the staged program.
-
-The resulting program is generated from the result value, resolving the transitive dependencies and then sorting them topologically to obtain a valid schedule that will produce the result (see [@betterfusion] for a detailed explanation).
-
-Here is a simple snippet of code
+During program evaluation, each definition is associated with a symbol, and that symbol is returned in place of the value for use in subsequent operations (see [@virtualization] & [@tagless] for the mechanism through which this is achieved). This allows LMS to automatically perform common subexpression elimination (CSE) on the IR. Every repeated definition in the user's program will be associated with the same symbol in the generated IR. To illustrate how it works, consider the following example.
 
 ```scala
 val x1 = x0 + 2
@@ -38,7 +40,7 @@ val x4 = if ( x2 ){
 }
 ```
 
-And here is the resulting AST
+The resulting IR would ressemble something like this
 
 ```scala
 TP(Sym(1), IntPlus(Sym(0), Const(2)))
@@ -47,7 +49,15 @@ TP(Sym(3), IntTimes(Sym(1), Const(3)))
 TP(Sym(4), IfThenElse(Sym(2), Sym(3), Sym(1)))
 ```
 
-As we can see, the computation for `x1` has not been duplicated for `x1bis` because it is the same, LMS returned `Sym(1)` in the `IfThenElse` node.
+As we can see, the computation for `x1` has not been duplicated for `x1bis` because it is the same, LMS returned `Sym(1)` in the `IfThenElse` definition.
+
+## Scheduling
+Since there is no explicit ordering of statements in the IR, we need an additional step to generate code. This step is called scheduling. Starting from the result expression of the program, the scheduler walks the list of dependencies backwards to collect all of the 
+statements that will compose the program. It then sorts them in order such that any statement comes after it's dependencies. The resulting schedule can then be used to generate code that will respect the semantics of the original program.
+
+## Scopes
+Since the
+
 
 ## Transformers and Mirroring
 As we've seen in the previous section, LMS can automatically perform generic optimization. For more specific optimizations, LMS provides a transformation API.
@@ -71,29 +81,10 @@ The main transformations performed by Delite are :
 | Horizontal Loop Fusion            | Fuses loops that iterate over the same range into the same loop | 
 
 
+<!-- The Delite Compiler Architecture -->
+Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). It can then be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) and run on heterogeneous architectures (CPU /GPU). 
+
 ## Parallel Patterns
-
-### Theory
-Delite operations are defined using collection of reusable parallel patterns. They are high level functional procedures that define how `DeliteCollection`s are used and transformed. `DeliteCollection`s are implemented by DSL authors and define the representation of the data. Each operation has very specific semantics and constrains the access pattern on the collection. This allows code generators and analysers to have a precise understanding of the semantics of the program and generate efficient code.
-
-There are four core operations defined in Delite [@eatperf]:
-*[SR: table might need just a little more explanation e.g. what is "Coll[V]" etc. in column 2?]*
-
-```scala
-Collect(c)(f)               : Coll[V]
-Reduce(c)(f)(r)             : V
-BucketCollect(c)(k)(f)      : Coll[Coll[V]]
-BucketReduce(c)(k)(f)(r)    : Coll[V]
-
-c: Index => Boolean     // condition
-k: Index => K           // key function
-f: Index => V           // value function
-r: (V, V) => V          // reduction function
-```
-
-These patterns are then extended to implement more specific operations. For example `Collect` can be used to implement `Map` or `Filter`, and `Reduce` can be extended to `Fold` or `Sum`.
-
-Delite provides code generators from each of these patterns to multiple platforms.
 
 ### Implementation
 
