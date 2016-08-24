@@ -1,0 +1,16 @@
+%% This is a simple template to add page breaks between sections
+
+%% Pandoc changes the definition of \paragraph, so we reset it temporarily when
+%% loading titlesec
+\let\savedparagraph\paragraph % Save pandoc's definition of paragraph 
+\let\paragraph\oldparagraph % Give the old definition that titlesec likes
+
+\let\savedsubparagraph\subparagraph % Same thing for subparagraph 
+\let\subparagraph\oldsubparagraph 
+
+% load titlesec
+\usepackage[compact]{titlesec}
+\newcommand{\sectionbreak}{\clearpage}
+
+\let\paragraph\savedparagraph % Reset to the correct definition
+\let\subparagraph\savedsubparagraph % Reset to the correct definition

@@ -34,12 +34,14 @@ for outfile in "$PDF" "$TEX"; do
   sed -e "s%/g/png%/g/pdf%" |\
   pandoc -f markdown -t latex \
     --smart \
-    --template="$TEMPLATES/default.latex" \
+    --include-in-header=templates/break-sections.tex \
+    --include-before-body=templates/titlepage.tex \
     --reference-links \
     --standalone \
     --number-sections \
     --default-image-extension=pdf \
     --toc \
+    --highlight-style=tango \
     --filter pandoc-citeproc \
     --bibliography="$SRC/biblio.bib" \
     --csl "$TEMPLATES/computer.csl" \

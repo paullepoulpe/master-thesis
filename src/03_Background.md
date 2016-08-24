@@ -27,27 +27,23 @@ f: Index => V           // value function
 r: (V, V) => V          // reduction function
 ```
 
-
-
-
- `DeliteCollection`s are implemented by DSL authors and define the representation of the data. Each operation has very specific semantics and constrains the access pattern on the collection. This allows code generators and analyzers to have a precise understanding of the semantics of the program and generate efficient code.
-These patterns are then extended to implement more specific operations. For example `Collect` can be used to implement `Map` or `Filter`, and `Reduce` can be extended to `Fold` or `Sum`.
+`Collect` accumulates all of the values generated and returns them as a collection. The condition function can guard the value function to prevent certain indices from being computed. It can be used to implement `map`, `zipWith`, `filter` or `flatmap`. The `Reduce` generator has an additional reduction function that is used to combine the generated values into a single result. It can be used to implement `sum` or `count`.
+The `BucketCollect` and `BucketReduce` generators use a key function to reduce and collect values into separate buckets. These operation can be used to implement the semantics of Google's `MapReduce` [@mapreduce].
 
 ## Optimizations
 
-*TODO make the link with multiloops*
+The Delite MultiLoop Language (DMLL) formalism can be used to express a large number of parallel patterns from a small well defined core. This allows for some powerful transformations and optimizations to be expressed in a simple concise way. In this section we present three common optimization that are part of the Delite compilation pipeline: `ArrayOfStruct` to `StructOfArray`, vertical loop fusion and horizontal loop fusion. These transformations are not new ideas [@soa] [@loopfusion], however, they are essential in the context of Delite. They can remove dependencies between elements of strucured data as well as combine computations under the same scope to enable further optimizations.
 
-Data processing applications deal with data that is structured in collections of records (`Array`s of `Struct`s). These collections are then queried to compute some information. Here is a toy example:
+We will use the following example to illustrate the differents transformations a program goes through.
 
 ```scala
 case class PeopleRecord(name: String, age: Int, 
         height: Double, address: String)
 
 val population: Collection[PeopleRecord] = 
-        fromFile("pop.json").slurp[PeopleRecord]
+        getFromFile("population.json")
 
-val heights = population    Where(_.age > 40)  
-                            Select(_.values.sum(_.height))
+val heights = population.Where(_.age > 40).Select(_.height)
 ```
 
 As is the case in the example above, most of these queries end up using only part of the information that is available in a given element of the collection. When written functionally, however, and implemented in the naive way, the whole collection has to flow through all the intermediate operations until it is discarded by the final filter. This is unnecessary and causes potentially a lot of memory to be used for no reason. Furthermore if the collection is not local to the computation, the communication overhead can become significant. (TODO: citation needed)
