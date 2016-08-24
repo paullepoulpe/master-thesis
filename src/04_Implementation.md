@@ -55,13 +55,32 @@ As we can see, the computation for `x1` has not been duplicated for `x1bis` beca
 Since there is no explicit ordering of statements in the IR, we need an additional step to generate code. This step is called scheduling. Starting from the result expression of the program, the scheduler walks the list of dependencies backwards to collect all of the 
 statements that will compose the program. It then sorts them in order such that any statement comes after it's dependencies. The resulting schedule can then be used to generate code that will respect the semantics of the original program.
 
-## Scopes
-Since the
+## Blocks & Scopes
+If we want to generate efficient code, we need to be able to represent structured computations in our IR. Loops and conditional statements cannot be considered the same way as other definitions, because the dependencies semantics is different than with other statements. 
 
+The problem becomes obvious when we look at the example we presented above. If we follow the naive scheduling algorithm, the order natural ordering of the IR would result in a valid schedule. We can notice however that both branches of the conditional are scheduled before the condition is even evaluated. This does not cause any inconsistencies in our toy example, however it may lead to unused expensive computations, or might alter the semantics of the original program if the branches contain side effects.
+
+To work around this problem, LMS provides a `Block` definition wrapper for symbol. It does not contain any strucural information other than the result statement of the block. A block carries the semantic that its contents belong to a different scope and should thus be treated differently by the code generator.
 
 ## Transformers and Mirroring
-As we've seen in the previous section, LMS can automatically perform generic optimization. For more specific optimizations, LMS provides a transformation API.
+As we've seen in previous sections, LMS automatically performs some generic optimization such as CSE and DCE. For more specific optimizations, LMS provides a transformation interface.
 
-A transformer walks through a schedule and processes each statement to decide whether it has to be changed or not. Even when a statement is not modified by the transformer, it's dependencies might have been and that has to be reflected in the node. In LMS, this process is called mirroring.
+A transformer is defined at it's core by a function from expression to expression. Transformers leverage the scheduler to walk through the IR in order. They traverse a schedule in order and process each statement to decide weatcher it needs to be transformed. Even when a statement is not modified, it's dependencies might have been changed. When this is the case, an updated version of the node has to be generated to reflect these new dependencies. In LMS, this process is called mirroring.
 
-Since the AST is immutable, mirroring has to generate a new node with the updated dependencies. The mirroring function also has the opportunity to perform domain specific optimization when generating the node depending on changes made to the dependencies.
+Since the IR is immutable, mirroring does not actually modify any nodes but generates new ones. LMS users can take advantage of that fact by defining generator functions that can perform domain-specific optimizations. Depending on the updated dependencies, it might be possible to return a simplified version of the node. 
+
+When defining a simple language to add integer for example, we might be able to fold certain operations when the operands are statically known.
+
+```scala
+case class IntPlus(x: Exp[Int], y: Exp[Int]) extends Def[Int]
+
+def int_plus(x: Exp[Int], y: Exp[Int]): Exp[Int] = (x, y) match {
+    case (Const(a), Const(b)) => Const(a + b)
+    case _ => IntPlus(x, y)
+}
+
+def mirror(e: Def[A], f: Transformer): Exp[A] = e match {
+    case IntPlus(x, y) => int_plus(f(x), f(y))
+    case _ => super.mirror(e, f)
+}
+```
