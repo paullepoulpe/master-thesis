@@ -13,68 +13,140 @@ Due to its ability to strip abstraction and generate highly efficient code, MSP 
 
 Design patterns are a well understood concept in software engineering. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are MapReduce [@mapreduce] and Spark [@spark].
 
-Delite [@delite] uses the `MultiLoop` formalism introduced in prior work [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Index` represents the type of the variable use to index the collection)
+Delite [@delite] uses the `MultiLoop` formalism introduced in prior work [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Int` represents the type of the variable use to index the collection)
 
 ```scala
-Collect(c)(f)               : Coll[V]
-Reduce(c)(f)(r)             : V
-BucketCollect(c)(k)(f)      : Coll[Coll[V]]
-BucketReduce(c)(k)(f)(r)    : Coll[V]
+Collect(s)(c)(f)               : Coll[V]
+Reduce(s)(c)(f)(r)             : V
+BucketCollect(s)(c)(k)(f)      : Coll[Coll[V]]
+BucketReduce(s)(c)(k)(f)(r)    : Coll[V]
 
-c: Index => Boolean     // condition
-k: Index => K           // key function
-f: Index => V           // value function
+s: Int                  // range of the loop
+c: Int => Boolean       // condition
+k: Int => K             // key function
+f: Int => V             // value function
 r: (V, V) => V          // reduction function
 ```
 
 `Collect` accumulates all of the values generated and returns them as a collection. The condition function can guard the value function to prevent certain indices from being computed. It can be used to implement `map`, `zipWith`, `filter` or `flatmap`. The `Reduce` generator has an additional reduction function that is used to combine the generated values into a single result. It can be used to implement `sum` or `count`.
 The `BucketCollect` and `BucketReduce` generators use a key function to reduce and collect values into separate buckets. These operation can be used to implement the semantics of Google's `MapReduce` [@mapreduce].
 
+An example implementation of `Collect` could be the following
+
+```scala
+// Collect(s)(c)(f) :
+val out = new Coll[V]
+for(i <- 0 until s){
+    if(c(i)) {
+        out += f(i)
+    }
+}
+```
 ## Optimizations
 
 The Delite MultiLoop Language (DMLL) formalism can be used to express a large number of parallel patterns from a small well defined core. This allows for some powerful transformations and optimizations to be expressed in a simple concise way. In this section we present three common optimization that are part of the Delite compilation pipeline: `ArrayOfStruct` to `StructOfArray`, vertical loop fusion and horizontal loop fusion. These transformations are not new ideas [@soa] [@loopfusion], however, they are essential in the context of Delite. They can remove dependencies between elements of strucured data as well as combine computations under the same scope to enable further optimizations.
 
-We will use the following example to illustrate the differents transformations a program goes through.
+We will use the following snippet of code to illustrate the differents transformations a program goes through.
 
 ```scala
-case class PeopleRecord(name: String, age: Int, 
-        height: Double, address: String)
+case class PersonRecord(name: String, age: Int, height: Double)
 
-val population: Collection[PeopleRecord] = 
-        getFromFile("population.json")
+val population: Coll[PersonRecord] = Array.fill(100) { i =>
+    val name = Disk.getName(i)
+    val age = Disk.getAge(i)
+    val height = Disk.getHeight(i)
+    PersonRecord(name, age, height)
+}
 
-val heights = population.Where(_.age > 40).Select(_.height)
+val query1 = population.Select(_.height)
+val query2 = population.Where(_.age > 40).Select(_.height)
 ```
 
-As is the case in the example above, most of these queries end up using only part of the information that is available in a given element of the collection. When written functionally, however, and implemented in the naive way, the whole collection has to flow through all the intermediate operations until it is discarded by the final filter. This is unnecessary and causes potentially a lot of memory to be used for no reason. Furthermore if the collection is not local to the computation, the communication overhead can become significant. (TODO: citation needed)
+This example is a typical example of what a data processing application could look like. We defined some strucure data to represent the model we are workign with, in this case a record representing a person. We then load a collection of those records from disk storage. Finally, we have two statements that query this collection to compute some result.
 
-In this section, we present three optimizations that allow us trim the collection of the unused fields as soon as they are not needed. This will make the program use the strictly necessary data.
+The first thing we can notice is that the name field in the `PersonRecord` is never read by the query. In the naive implementation however, these fields have to be loaded from disk, parsed and carried around until they are discarded by the `Select` clause. This creates a computation and memory overhead that might not be negligible, especially if the size of the `name` field is significantly larger than the few bytes required to represent the other two fields.
 
 ### `ArrayOfStruct` to `StructofArray`
-Using LMS records, Delite can introspect in the structure of the data that composes its collections. This allows us to perform `ArrayOfStruct` to `StructOfArray` or `SoA` transformations.
+High level data structures are an essential part of modern programming. Wheater designed for functional, imperative or object oriented programming, every language has a mechanism to create complex data strucures by grouping simpler ones (`C++`'s `struct`, `Java`'s `class`, `haskell`'s `Product` type). This very useful abstraction can however get in the way of compiler optimizations as it introduces some dependencies between parts of data.
 
-This transform iterates over all of the loops in the schedule that are generating collections of structures, and replaces them with a collection of loops generating one field of the structure each. It then replaces all references to the original collection with a reference to the corresponding loop.
+Using a generic implementation of `Records` provided by LMS, Delite is able to understand  how that data is structured. This lets Delite to statically dispatch most field accesses and allows DCE to get rid of the unused fields. 
 
-This allows us to separate the fields from the original collection and remove dependencies between loops that access only one field the structure and the other fields.
+`ArrayOfStruct` to `StructofArray` (`AoS` to `SoA`) or `MultiLoop` `SoA` is an extension of the mechanism described above that works on collection of `Records`. The transformation iterates over all of the patterns that produce a collection of structures and rewrites them to produce a single structure of collections, each one corresponting to a field in the original structure. It then marks the result to keep track of the transformation and rewrites the original collection's methods to work on the result of the transformation. Using the same mechanism as described above, it can rewrite accesses to the `SoA` representation by statically dispatching them.
 
-*[SR: Maybe you should rewrite the second half of that last sentence...do you mean to say "...remove dependencies between loops that access only one field of the structure and loops [or operations] that access the other fields."]*
+Ignoring the second query from the example above, the transformation's result would look something like the following.
 
-TODO: maybe example of result ?
+The `population` collection can be split into 3 separate collections
 
-*[SR: Yes I think an example might be nice; either code if it's simple and/or a diagram showing the three transformations...either three separate diagrams or a single diagram showing the three phases, either one would work.]*
+```scala
+val names: Coll[String] = Array.fill(100){i => Disk.getName(i)}
+val ages: Coll[Int] = Array.fill(100){i => Disk.getAge(i)}
+val heights: Coll[Double] = Array.fill(100){i => Disk.getHeight(i)}
+
+val population = SoACollection[PersonRecord](
+        "name" -> names, 
+        "age" -> ages, 
+        "height" -> heights)
+```
+
+Since the type of the `population` collection is statically known, access to it can be statically dispatched and the query can be rewritten as follows.
+
+```scala
+val query1 = heights.Select(x => x)
+```
+Since the `population` variable is not referenced anywhere in the resulting code, it can be safely eliminated along with the all of the `name` and `age` fields.
 
 ### Vertical Loop Fusion
-After the `SoA` transformation in the example above, we now have an array for the `address` field that is being created but never actually used. We also generate a `Collection[PeopleRecord]` that is never used for anything else than being consumed by the `Where` clause. Similarly the collection produced by the `Where` clause is immediately consumed by the `Select`.
 
-To avoid creating intermediate collections, Delite uses LMS to perform vertical loop fusion where it merges together the bodies of the consumers in their producers. This results in one large loop that directly computes the `heights` result and allows the scheduler to remove all of the computation needed to compute the `address` field.
+Functional style programming has many advantages. It is easier to reason about independent and composable operations than explicit imperative loops. However, naive implementations of these operations can be very inefficient as they create a large amount of intermediate collections.
 
-TODO: maybe example of result ?
+Using the second query from our example, we can see that the collection that is being produced by the `Where` clause and consumed by the `Select` is never referenced anywhere else in the code. In these conditions, vertical fusion can merge the body of the producer into the consumer, and thus get rid of the intermediate structure in its entirety. 
+
+It is also no accident that we only used the first query in our `SoA` example. The chained operations in the second query prevent us from getting rid of the population, as the intermediate collection depends on the `population` variable.
+
+Too visualize the effect of loop fusion we first need to give some implementation of `Where` and `Select` using our `MultiLoop` language.
+
+```scala
+trait Coll[T] { 
+    def size: Int = ... // the size of the colleciton
+    def get(idx: Int): T = ... // retrieves the value at idx
+    def Where(cond: T => Boolean): Coll[T] = {
+        Collect(cond)(i => this.get(i)) 
+    }
+    def Select(func: T => V): Coll[V] = {
+        Collect(size)(_ => true)(i => func.apply(this.get(i)))
+    }
+}
+```
+
+The result of vertical fusion on the second query would thus look like this
+
+```scala
+val query2 = Collect(100)(i => ages(i) > 40)(i => heights(i))
+```
+
+All of the dependencies to the `SoA` structure have been removed, and the `names` collection can be safely removed from generated code.
 
 ### Horizontal Loop Fusion
-The problem with the previous two optimizations alone is that now we have a large number of loops that are potentially duplicating computation. If the elements of the original array shared some code, now this code is duplicated across all of the loops.
+The problem with the previous two optimizations alone is that now we have a potentially large number of loops that might be duplicating computation. If the elements of the original array shared some code, now this code is duplicated across all of the loops.
 
-To solve this problem we merge all of the loops iterating over the same range. All of the computation will thus be in the same scope and LMS's CSE optimization will take care of sharing the computation for all of the fields.
+To solve this problem we merge all of the loops iterating over the same range. All of the computations will thus be in the same scope and LMS's CSE optimization will take care of sharing the computation for all of the fields.
 
-TODO: maybe example of result ?
+Applying all of the optimizations described above to our example and lowering the result to our implementation of `Collect`, we obtain the following
 
-*[SR: Background section looks excellent!  You may or may not want a transition paragraph here at the end, preapring the reader for what comes next e.g. something like "Next we will discuss in more detail specifically how we implemented these optimizations in the context of our system, the problems we encountered and the toosl we built to attack those problems blah blah bla... :) ]*
+```scala
+val ages: Coll[Int] = Array.fill(100){i => Disk.getAge(i)}
+val heights: Coll[Double] = Array.fill(100){i => Disk.getHeight(i)}
+
+val query1 = new Coll[Double]
+val query2 = new Coll[Double]
+
+for(i <- 0 until 100){
+    val h = heights(i)
+    query1 += h
+    if(ages(i) > 40) query2 += h
+}
+```
+The computation of `h` is not duplicated across the loops anymore, and all reference to the `names` collection has disappeared.
+
+Next we will discuss in more details how these optimizations are implemented in the context of the our system. We will show how multiloops are encoded in Delite, and how it had to be modified to take advantage of the improvements made in the loop fusion optimizations. We will also present some of the problems we have encountered while redesigning the framework and the tools we have created to help tackle similar problems in the future.
+
