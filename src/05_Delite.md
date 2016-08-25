@@ -100,7 +100,7 @@ abstract class DeliteOpLoop[A] extends AbstractLoop[A]
 }
 ```
 
-`DeliteCollection` is an interface provided by Delite for DSL authors. These latter can implement it with their own collection and use Delite Ops to operate on them.
+`DeliteCollection` is an interface provided by Delite for DSL authors. These latter can implement it with their own collection and use Delite Ops to operate on them, as in the diagram below.
 
 ![Delite loops hierarchy](http://www.dotty.ch/g/png?
   digraph G {
