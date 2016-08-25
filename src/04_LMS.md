@@ -4,7 +4,7 @@ To understand the design of the Delite framework, we first have to take a step b
 ## Sea of Nodes
 The format that LMS uses [@lms] for its IR is based on expression trees and single static assignments (SSA). More exactly, it uses what is called a "sea of nodes" representaiton. 
 
-The IR is composed of a collection of statements, or typed pairs (TP). Every pair contains a symbol and a definition. A symbol is a simple reference to the statement it defines. Definitions are used to express how expressions can be combined. Expressions are restricted to symbols and constants. The typing information is expressed using scala's type system and stored using a typeclass within each symbol.
+The IR is composed of a collection of statements, or typed pairs (TP). Every pair contains a symbol and a definition. A symbol is a simple reference to the statement it defines. Definitions are used to express how expressions can be combined. Expressions are restricted to symbols and constants. The typing information is expressed, using scala's type system, in a typeclass within each symbol.
 
 Here is a summary of the types used in the IR:
 
@@ -24,7 +24,7 @@ case class TP[+T](sym: Sym[T], rhs: Def[T])
 ```
 
 
-`Exp[T]` is an interface that represents an expression of type `T`. Constants and symbols are the only elements implementing that interface. Composite operations are defined using `Def`s and can only reference symbols or constants. All the symbols that are referenced by a definition are called it's dependencies and get be queried through the `syms` function.
+`Exp[T]` is an interface that represents an expression of type `T`. Constants and symbols are the only elements implementing that interface. Composite operations are defined using `Def`s and can only reference symbols or constants. All the symbols that are referenced by a definition are called its dependencies and get be queried through the `syms` function.
 
 During program evaluation, each definition is associated with a symbol, and that symbol is returned in place of the value for use in subsequent operations (see [@virtualization] & [@tagless] for the mechanism through which this is achieved). This allows LMS to automatically perform common subexpression elimination (CSE) on the IR. Every repeated definition in the user's program will be associated with the same symbol in the generated IR. To illustrate how it works, consider the following example.
 
@@ -53,7 +53,7 @@ As we can see, the computation for `x1` has not been duplicated for `x1bis` beca
 
 ## Scheduling
 Since there is no explicit ordering of statements in the IR, we need an additional step to generate code. This step is called scheduling. Starting from the result expression of the program, the scheduler walks the list of dependencies backwards to collect all of the 
-statements that will compose the program. It then sorts them in order such that any statement comes after it's dependencies. The resulting schedule can then be used to generate code that will respect the semantics of the original program.
+statements that will compose the program. It then sorts them in order such that any statement comes after its dependencies. The resulting schedule can then be used to generate code that will respect the semantics of the original program.
 
 ## Blocks & Scopes
 If we want to generate efficient code, we need to be able to represent structured computations in our IR. Loops and conditional statements cannot be considered the same way as other definitions, because the dependencies semantics is different than with other statements. 
@@ -65,7 +65,7 @@ To work around this problem, LMS provides a `Block` definition wrapper for symbo
 ## Transformers and Mirroring
 As we've seen in previous sections, LMS automatically performs some generic optimization such as CSE and DCE. For more specific optimizations, LMS provides a transformation interface.
 
-A transformer is defined at it's core by a function from expression to expression. Transformers leverage the scheduler to walk through the IR in order. They traverse a schedule in order and process each statement to decide weatcher it needs to be transformed. Even when a statement is not modified, it's dependencies might have been changed. When this is the case, an updated version of the node has to be generated to reflect these new dependencies. In LMS, this process is called mirroring.
+A transformer is defined at its core by a function from expression to expression. Transformers leverage the scheduler to walk through the IR in order. They traverse a schedule in order and process each statement to decide weatcher it needs to be transformed. Even when a statement is not modified, its dependencies might have been changed. When this is the case, an updated version of the node has to be generated to reflect these new dependencies. In LMS, this process is called mirroring.
 
 Since the IR is immutable, mirroring does not actually modify any nodes but generates new ones. LMS users can take advantage of that fact by defining generator functions that can perform domain-specific optimizations. Depending on the updated dependencies, it might be possible to return a simplified version of the node. 
 
