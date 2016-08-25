@@ -65,13 +65,11 @@ To work around this problem, LMS provides a `Block` definition wrapper for a sym
 ## Transformers and Mirroring
 As we've seen in previous sections, LMS automatically performs some generic optimizations such as CSE and DCE. For more specific optimizations, LMS provides a transformation interface.
 
-A transformer is defined at its core as a function from expression to expression. Transformers 
-~leverage the scheduler to walk through the IR in order. They ~
-traverse a schedule in order and process each statement to decide whether it needs to be transformed. Even when a statement is not modified, its dependencies might have been changed. When this is the case, an updated version of the node has to be generated to reflect these new dependencies. In LMS, this process is called mirroring.
+A transformer is defined at its core as a function from expression to expression. Transformers leverage the scheduler to walk through the IR in order. They traverse a schedule in order and process each statement to decide whether it needs to be transformed. Even when a statement is not modified, its dependencies might have been changed. When this is the case, an updated version of the node has to be generated to reflect these new dependencies. In LMS, this process is called mirroring.
 
 Since the IR is immutable, mirroring does not actually modify any nodes but generates new ones. LMS users can take advantage of that fact by defining generator functions that can perform domain-specific optimizations. Depending on the updated dependencies, it might be possible to return a simplified version of the node. 
 
-When defining a simple language to add integer for example, we might be able to fold certain operations when the operands are statically known.
+When defining a simple language to add two integers for example, we might be able to fold certain operations when the operands are statically known.
 
 ```scala
 case class IntPlus(x: Exp[Int], y: Exp[Int]) extends Def[Int]
