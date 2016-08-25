@@ -4,7 +4,7 @@ To understand the design of the Delite framework, we first have to take a step b
 ## Sea of Nodes
 The format that LMS uses [@lms] for its IR is based on expression trees and single static assignments (SSA). More exactly, it uses what is called a "sea of nodes" representaiton. 
 
-The IR is composed of a collection of statements, or typed pair (TP). Every pair contains a symbol and a definition. A symbol is a simple reference to the statement it defines. Definitions are used to express how expressions can be combined. Expressions are restricted to symbols and constants. The typing information is expressed using scala's type system and in a typeclass within each symbol.
+The IR is composed of a collection of statements, or typed pairs (TP). Every pair contains a symbol and a definition. A symbol is a simple reference to the statement it defines. Definitions are used to express how expressions can be combined. Expressions are restricted to symbols and constants. The typing information is expressed, using scala's type system, in a typeclass within each symbol.
 
 Here is a summary of the types used in the IR:
 
