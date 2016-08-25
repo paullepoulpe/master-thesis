@@ -14,14 +14,15 @@ The main transformations phases performed by Delite are:
 | --------------------------------- | ----------------------------------------------------- |
 | Device Independent Lowering       | Lowers DSL definitions into generic Delite operations such as loop traversals |
 | Device Dependent Lowering         | Performs additional transforms specific to the  target platform |
-| `Multiloop SoA`                     | Or `ArrayOfStruct` to `StructofArray`. Splits loops generating arrays of structures into a single structure multiple loops generating an array for each field. | 
+| `Multiloop SoA`                     | Or `ArrayOfStruct` to `StructofArray`. Splits loops generating arrays of structures into a single structure of multiple loops generating an array for each field. | 
 | Vertical Loop Fusion              | Fuses producer and consumer loops to eliminate intermediate data structures |
 | Horizontal Loop Fusion            | Fuses loops that iterate over the same range | 
 
 
 ## Delite Ops
 
-To simplify the developpment of DSL's, Delite provides a large collection of reusable operations (ops). Those operations include, among other things, the Delite `MultiLoop` Language (DMLL) we presented in a previous section. This allows new ops to be created that use the core DMLL generators and are thus automatically supported by the compilation pipeline.
+To simplify the development of DSL's, Delite provides a large collection of reusable operations (ops). Those operations include, among other things, the Delite `MultiLoop` Language (DMLL) we presented in a previous section. This allows new ops to be created that use the core DMLL generators and are thus automatically supported by the compilation pipeline.
+*[SR: I don't remember seeing DMLL in previous section?  Was it in Intro?]*
 
 ### Elems
 In their encoding of their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that define the semantics of the different operations and can be used as loops body. DMLL's generators are also encoded as `Elems`.
