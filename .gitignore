@@ -6,3 +6,6 @@ images/*converted-to*
 
 # Temp files
 .*.swp
+
+# OSX files
+.DS_Store
