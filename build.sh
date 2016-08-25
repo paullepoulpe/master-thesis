@@ -14,8 +14,7 @@ if [ "$1" = "--spellcheck" ]; then
   # Run interactive mode to fix spelling mistakes
   mdspell --ignore-acronyms --en-us "$SRC/*.md" || exit 1
 elif [ "$1" != "--nospellcheck" ]; then
-  # By default only run in batch mode
-  mdspell --report --ignore-acronyms --en-us "$SRC/*.md" || exit 1
+  mdspell --report --ignore-acronyms --en-us "$SRC/*.md"
 fi
 
 # Concatenate all files with space in between
