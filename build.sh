@@ -1,35 +1,49 @@
 #!/usr/bin/env bash
-#set -x
 
-SRC=src
-TEMPLATES=templates
-BUILD=build
+open=false
+interactive_spellcheck=false
+batch_spellcheck=true
 
-if [ ! -d "$BUILD" ]; then 
-  mkdir "$BUILD"
+while test $# -gt 0
+do
+    case "$1" in
+        --spellcheck) interactive_spellcheck=true
+            ;;
+        --nospellcheck) batch_spellcheck=false
+            ;;
+        --open) open=true
+            ;;
+        *) echo "unrecognized option $1"
+            ;;
+    esac
+    shift
+done
+
+if [ ! -d build ]; then 
+  mkdir build
 fi
 
 # Spell check the files
-if [ "$1" = "--spellcheck" ]; then
+if [ $interactive_spellcheck = true ]; then
   # Run interactive mode to fix spelling mistakes
-  mdspell --ignore-acronyms --en-us "$SRC/*.md" || exit 1
-elif [ "$1" != "--nospellcheck" ]; then
-  mdspell --report --ignore-acronyms --en-us "$SRC/*.md"
+  mdspell --ignore-acronyms --en-us src/*.md || exit 1
+elif [ $batch_spellcheck = true ]; then
+  mdspell --report --ignore-acronyms --en-us src/*.md
 fi
 
 # Concatenate all files with space in between
-rm -f "$BUILD/thesis.md"
-for f in "$SRC"/*.md; do 
+rm -f build/thesis.md
+for f in src/*.md; do 
   cat "${f}"; echo; echo;
-done >> "$BUILD/thesis.md";
+done >> build/thesis.md;
 
 # Generate both pdf and tex (for inspection)
-PDF="$BUILD/thesis.pdf"
-TEX="$BUILD/thesis.tex"
+PDF=build/thesis.pdf
+TEX=build/thesis.tex
 
 for outfile in "$PDF" "$TEX"; do
   echo -n "Compiling thesis to $outfile ..."
-  cat "$BUILD/thesis.md" |\
+  cat build/thesis.md |\
   sed -e "s%/g/png%/g/pdf%" |\
   pandoc -f markdown -t latex \
     --smart \
@@ -42,15 +56,15 @@ for outfile in "$PDF" "$TEX"; do
     --toc \
     --highlight-style=tango \
     --filter pandoc-citeproc \
-    --bibliography="$SRC/biblio.bib" \
-    --csl "$TEMPLATES/computer.csl" \
+    --bibliography=src/biblio.bib \
+    --csl templates/computer.csl \
     -V fontsize=12pt \
     --variable=geometry:a4paper \
     -o $outfile
   echo " Done !"
 done
 
-if [ "$1" = "--open" ]; then
-  open "$BUILD/thesis.pdf"
+if [ $open = true ]; then
+  open build/thesis.pdf
 fi
 
