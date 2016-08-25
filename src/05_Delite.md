@@ -6,17 +6,17 @@ Delite is composed of two separate parts, a compilation framework, and a runtime
 
 ## Compilation Pipeline
 
-Delite uses LMS's staging mechanism to lift DSL programs into IR. This IR then goes through a series of transformers and optimization before it reaches code generation.
+Delite uses LMS's staging mechanism to lift DSL programs into IR. This IR then goes through a series of transformers and optimizations before code generation.
 
-The main transformations phases performed by Delite are the following:
+The main transformations phases performed by Delite are:
 
 | Name                              | Description                                           |
 | --------------------------------- | ----------------------------------------------------- |
-| Device Independent Lowering       | Lowers DSL definitions into generic delite operations such as loop traversals |
-| Device Dependent Lowering         | Performs additional transforming specific to the  target platform |
-| `Multiloop SoA`                     | Or `ArrayOfStruct` to `StructofArray`. Splits loops generating arrays of structures into a single strucutre multiple loops generating an array for each field. | 
-| Vertical Loop Fusion              | Fuses producer and consumer loops together to eliminate intermediate data structures |
-| Horizontal Loop Fusion            | Fuses loops that iterate over the same range into the same loop | 
+| Device Independent Lowering       | Lowers DSL definitions into generic Delite operations such as loop traversals |
+| Device Dependent Lowering         | Performs additional transforms specific to the  target platform |
+| `Multiloop SoA`                     | Or `ArrayOfStruct` to `StructofArray`. Splits loops generating arrays of structures into a single structure multiple loops generating an array for each field. | 
+| Vertical Loop Fusion              | Fuses producer and consumer loops to eliminate intermediate data structures |
+| Horizontal Loop Fusion            | Fuses loops that iterate over the same range | 
 
 
 ## Delite Ops
