@@ -25,11 +25,11 @@ To simplify the development of DSL's, Delite provides a large collection of reus
 *[SR: I don't remember seeing DMLL in previous section?  Was it in Intro?]*
 
 ### Elems
-In their encoding of their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that define the semantics of the different operations and can be used as loops body. DMLL's generators are also encoded as `Elems`.
+To encode their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that define the semantics of the different operations and can be used as loop bodies. DMLL's generators are also encoded as `Elems`.
 
 Here is the type hierarchy of Delite's `Elems`. We can easily recognize our four DMLL generators [^1]. 
 
-[^1]: `BucketCollect` (resp. `BucketReduce`) is named `HashCollect` (resp. `HashReduce`) in the Delite context
+[^1]: `BucketCollect` (resp. `BucketReduce`) is named `HashCollect` (resp. `HashReduce`) in the Delite context.
 
 ![Delite Elems Hierarchy](https://www.dotty.ch/g/png?
   digraph G {
