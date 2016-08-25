@@ -79,7 +79,7 @@ In the type hierarchy of Delite's `Elems` below, we can easily recognize our fou
 ### Ops
 Delite `Ops` compose the interface that's facing DSL authors. They provide the building blocks for defining operations on DSL defined data structures. 
 
-Delite Loops, for example, extend the simple loop mechanism provided by LMS, and provide operations to composer or transform `DeliteCollection`s.
+Delite Loops, for example, extend the simple loop mechanism provided by LMS, and provide operations to compose or transform `DeliteCollection`s.
 
 ```scala
 abstract class AbstractLoop[A] extends Def[A] {
