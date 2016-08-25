@@ -1,5 +1,5 @@
 # Lightweight Modular Staging
-To understand the design of the Delite framework, we first have to take a step back and explain the inner workings of LMS. This section explains in detail the intermediate representation (IR) that LMS uses to model computations. We also briefly explain the mechanism that used to create to lift program into IR as well as the interface used to express IR transformations.
+To understand the design of the Delite framework, we first have to take a step back and explain the inner workings of LMS. This section explains in detail the intermediate representation (IR) that LMS uses to model computations. We also briefly explain the mechanism that is used to lift porgrams into IR as well as the interface used to express IR transformations.
 
 ## Sea of Nodes
 The format that LMS uses [@lms] for it's IR is based on expression trees and single static assignments (SSA). More exactly, it uses what is called a "sea of nodes" representaiton. 
