@@ -70,7 +70,7 @@ A transformer is defined at its core as a function from expression to expression
 Since the IR is immutable, mirroring does not actually modify any nodes but generates new ones. LMS users can take advantage of that fact by defining generator functions that can perform domain-specific optimizations. Depending on the updated dependencies, it might be possible to return a simplified version of the node. 
 
 When defining a simple language to add two integers for example, we might be able to fold certain operations when the operands are statically known.
-In the example below, the transformer performs constant two constants at compile time, replacing the original expression with the result, and preventing an unnecessary runtime addition.
+In the example below, the transformer performs the constant addition at compile time, replacing the original expression with the result, preventing unnecessary runtime addition.
 
 ```scala
 case class IntPlus(x: Exp[Int], y: Exp[Int]) extends Def[Int]
