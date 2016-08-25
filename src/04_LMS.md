@@ -40,7 +40,7 @@ val x4 = if ( x2 ){
 }
 ```
 
-The resulting IR would ressemble something like this
+The resulting IR would resemble something like this
 
 ```scala
 TP(Sym(1), IntPlus(Sym(0), Const(2)))
