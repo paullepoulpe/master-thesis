@@ -14,7 +14,7 @@
     - Talk about loop fusion and Soa
     - on the way to loop fusion we discovered and adressed a need for better debugging / visualisation tools
 
-3. Background // and related work
+3. Background & Theory // and related work
     - Keep it short for each project
     - Use all of the references
     - talk about delite
@@ -23,12 +23,20 @@
     - optimizations - soa
     - optimizations - loop fusion
 
-4. Implementation
+4. LMS
+    - How does lms work
+    - What is the IR, how do transformations work
+
+5. Delite
     - Parallel patterns in Delite
-    - parts of what is currently in Background
-    - what's wrong with old loop fusion
+
+6. Delite Redesign
     - go into details of what had to be changed
     - How it used to be , how it is now
+
+7. Delite tooling
+    - What are the unique challenges when working with a staging compilers
+    - Some techniques that can be used to tackle those challenges
 
 5. Evaluation
     - amount of stuff that compiles -> was broken, is fixed

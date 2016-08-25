@@ -110,7 +110,7 @@ trait Coll[T] {
     def size: Int = ... // the size of the colleciton
     def get(idx: Int): T = ... // retrieves the value at idx
     def Where(cond: T => Boolean): Coll[T] = {
-        Collect(cond)(i => this.get(i)) 
+        Collect(size)(cond)(i => this.get(i)) 
     }
     def Select(func: T => V): Coll[V] = {
         Collect(size)(_ => true)(i => func.apply(this.get(i)))

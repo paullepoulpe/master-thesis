@@ -1,1 +1,1 @@
-# Redesigning Delite Ops
+# Tooling for Delite
