@@ -56,11 +56,11 @@ Since there is no explicit ordering of statements in the IR, we need an addition
 statements that will compose the program. It then sorts them in order such that any statement comes after its dependencies. The resulting schedule can then be used to generate code that will respect the semantics of the original program.
 
 ## Blocks & Scopes
-If we want to generate efficient code, we need to be able to represent structured computations in our IR. Loops and conditional statements cannot be considered the same way as other definitions, because the dependencies semantics is different than with other statements. 
+If we want to generate efficient code, we need to be able to represent structured computations in our IR. Loops and conditional statements cannot be considered the same way as other definitions, because the dependency semantics is different than with other statements. 
 
-The problem becomes obvious when we look at the example we presented above. If we follow the naive scheduling algorithm, the order natural ordering of the IR would result in a valid schedule. We can notice however that both branches of the conditional are scheduled before the condition is even evaluated. This does not cause any inconsistencies in our toy example, however it may lead to unused expensive computations, or might alter the semantics of the original program if the branches contain side effects.
+The problem becomes obvious when we look at the example we presented above. If we follow the naive scheduling algorithm, the  natural ordering of the IR would result in a valid schedule. We can notice however that both branches of the conditional are scheduled before the condition is even evaluated. This does not cause any inconsistencies in our toy example, however it may lead to unused expensive computations, or might alter the semantics of the original program if the branches contain side effects.
 
-To work around this problem, LMS provides a `Block` definition wrapper for symbol. It does not contain any strucural information other than the result statement of the block. A block carries the semantic that its contents belong to a different scope and should thus be treated differently by the code generator.
+To work around this problem, LMS provides a `Block` definition wrapper for a symbol. It does not contain any structural information other than the result statement of the block. A block carries the semantic information that its contents belong to a different scope and should thus be treated differently by the code generator.
 
 ## Transformers and Mirroring
 As we've seen in previous sections, LMS automatically performs some generic optimization such as CSE and DCE. For more specific optimizations, LMS provides a transformation interface.
