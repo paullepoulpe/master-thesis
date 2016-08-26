@@ -1,9 +1,13 @@
 #!/usr/bin/env bash
 
+# Default options
 open=false
 interactive_spellcheck=false
 batch_spellcheck=true
+outputs=()
+formats=()
 
+# Process command line arguments
 while test $# -gt 0
 do
     case "$1" in
@@ -13,12 +17,25 @@ do
             ;;
         --open) open=true
             ;;
+        --pdf) outputs+=(pdf); formats+=(latex) 
+            ;;
+        --tex) outputs+=(tex); formats+=(latex)
+            ;;
+        --docx) outputs+=(docx); formats+=('')
+            ;;
         *) echo "unrecognized option $1"
             ;;
     esac
     shift
 done
 
+# If no target is specified, pick pdf only
+if [ ${#outputs[@]} -eq 0 ]; then
+  outputs+=(pdf)
+  formats+=(latex)
+fi
+
+# Create build directory if not present
 if [ ! -d build ]; then 
   mkdir build
 fi
@@ -37,17 +54,14 @@ for f in src/*.md; do
   cat "${f}"; echo; echo;
 done >> build/thesis.md;
 
-# Generate both pdf and tex (for inspection)
-outputs=(pdf    tex     docx)
-formats=(latex  latex   '')
-
+# Generate documents for all output formats 
 for idx in "${!outputs[@]}"; do
   outfile="build/thesis.${outputs[$idx]}"
   format="${formats[$idx]}"
   if [ ! -z $format ]; then
     format="-t $format"
   fi
-  echo -n "Compiling thesis to $outfile with ($format) ..."
+  echo -n "Compiling thesis to $outfile ($format) ..."
   cat build/thesis.md |\
   sed -e "s%/g/png%/g/pdf%" |\
   pandoc -f markdown $format \
