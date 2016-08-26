@@ -75,7 +75,7 @@ Using a generic implementation of `Records` provided by LMS, Delite is able to u
 
 Ignoring the second query from the example above, the transformation's result would look something like the following.
 
-The `population` collection can be split into 3 separate collections
+The `population` collection can be split into 3 separate collections [^1back].
 
 ```scala
 val names: Coll[String] = Array.fill(100){i => Disk.getName(i)}
@@ -173,3 +173,4 @@ All reference to the `names` collection has disappeared. Furthermore, since the 
 
 Next we will discuss in more details how these optimizations are implemented in the context of the our system. We will show how `MultiLoop`s are encoded in Delite, and how it had to be modified to take advantage of the improvements made in the loop fusion optimizations. We will also present some of the problems we have encountered while redesigning the framework and the tools we have created to help tackle similar problems in the future.
 
+[^1back]: `SoACollection` is a wrapper for a normal collection that carries additional information about the `SoA` transformation.
