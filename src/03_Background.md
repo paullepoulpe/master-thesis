@@ -62,7 +62,7 @@ val query1 = population.Select(_.height)
 val query2 = population.Where(_.age > 40).Select(_.height)
 ```
 
-This example is a typical example of what a data processing application could look like. We defined some structure data to represent the model we are working with, in this case a record representing a person. We then load a collection of those records from disk storage. Finally, we have two statements that query this collection to compute some result.
+We define some structure data to represent the model we are working with, in this case a record representing a person. We then load a collection of those records from some disk storage abstraction . Finally, we have two statements that query this collection to compute some result.
 
 The first thing we can notice is that the name field in the `PersonRecord` is never read by the query. In the naive implementation however, these fields have to be loaded from disk, parsed and carried around until they are discarded by the `Select` clause. This creates a computation and memory overhead that might not be negligible, especially if the size of the `name` field is significantly larger than the few bytes required to represent the other two fields.
 
@@ -71,7 +71,7 @@ High level data structures are an essential part of modern programming. Whether 
 
 Using a generic implementation of `Records` provided by LMS, Delite is able to understand  how that data is structured. This lets Delite to statically dispatch most field accesses and allows DCE to get rid of the unused fields. 
 
-`ArrayOfStruct` to `StructofArray` (`AoS` to `SoA`) or `MultiLoop` `SoA` is an extension of the mechanism described above that works on collection of `Records`. The transformation iterates over all of the patterns that produce a collection of structures and rewrites them to produce a single structure of collections, each one corresponding to a field in the original structure. It then marks the result to keep track of the transformation and rewrites the original collection's methods to work on the result of the transformation. Using the same mechanism as described above, it can rewrite accesses to the `SoA` representation by statically dispatching them.
+`ArrayOfStruct` to `StructOfArray` (`AoS` to `SoA`) or `MultiLoop` `SoA` is an extension of the mechanism described above that works on a collection of `Records`. The transformation iterates over all of the patterns that produce a collection of structures and rewrites them to produce a single structure of collections, each one corresponding to a field in the original structure. It then marks the result to keep track of the transformation and rewrites the original collection's methods to work on the result of the transformation. Using the same mechanism as described above, it can rewrite accesses to the `SoA` representation by statically dispatching them.
 
 Ignoring the second query from the example above, the transformation's result would look something like the following.
 
