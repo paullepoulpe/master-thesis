@@ -13,7 +13,7 @@ Due to its ability to strip abstraction and generate highly efficient code, MSP 
 
 Design patterns are a well understood concept in software engineering [@designpatterns]. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are `MapReduce` [@mapreduce] and Spark [@spark].
 
-Delite [@delite] uses the `MultiLoop` formalism introduced in prior work [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Int` represents the type of the variable use to index the collection)
+Delite [@delite] uses the `MultiLoop` (also called Delite `MultiLoop`language, or DMLL) formalism introduced in prior work [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Int` represents the type of the variable use to index the collection)
 
 ```scala
 Collect(s)(c)(f)               : Coll[V]
@@ -44,7 +44,7 @@ for(i <- 0 until s){
 ```
 ## Optimizations
 
-The Delite `MultiLoop` Language (DMLL) formalism can be used to express a large number of parallel patterns from a small well defined core. This allows for some powerful transformations and optimizations to be expressed in a simple concise way. In this section we present three common optimization that are part of the Delite compilation pipeline: `ArrayOfStruct` to `StructOfArray`, vertical loop fusion and horizontal loop fusion. These transformations are not new ideas [@soa] [@loopfusion], however, they are essential in the context of Delite. They can remove dependencies between elements of structured data as well as combine computations under the same scope to enable further optimizations.
+The DMLL formalism can be used to express a large number of parallel patterns from a small well defined core. This allows for some powerful transformations and optimizations to be expressed in a simple concise way. In this section we present three common optimization that are part of the Delite compilation pipeline: `ArrayOfStruct` to `StructOfArray`, vertical loop fusion and horizontal loop fusion. These transformations are not new ideas [@soa] [@loopfusion], however, they are essential in the context of Delite. They can remove dependencies between elements of structured data as well as combine computations under the same scope to enable further optimizations.
 
 We will use the following snippet of code to illustrate the different transformations a program goes through.
 
