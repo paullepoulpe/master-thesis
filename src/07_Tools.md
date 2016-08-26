@@ -6,13 +6,13 @@ There are several techniques that can be used to examine why a program is misbeh
 
 We call the first approach the "Logpocalypse" technique. This method consists of inserting additional code to the program that will print out the state we are interested in examining through the execution of the program. This has several drawbacks however: the first one is that we incur a compilation overhead every time we want to inspect a different part of the state; another one is that some classes of bugs such as heisenbugs [^4] can be significantly harder to study with this approach.
 
-An more powerful approach to tackle software bugs is by using a debugger. A debugger
+A more powerful approach to tackle software bugs is by using a debugger. A debugger
 allows us to interrupt the program at the moment when a symptom occurs, and examine the program's internal state (local variables, call trace) that causes the symptom to occur.
 
-Both method have their advantages [@debug]. However, the logging method is significantly easier to implement without the support of a specialized tool. Furthermore, because of the structure of the LMS framework, we found it is in practice quite difficult to extract useful information about the structure of the program being staged. The abstractions used by LMS itself to represent the IR and the relationship between symbols and definitions get in the way of the debugger. A general purpose debugger is therefore not practical when it comes to LMS.
+Both methods have their advantages [@debug]. However, the logging method is significantly easier to implement without the support of a specialized tool. Furthermore, because of the structure of the LMS framework, we found it is in practice quite difficult to extract useful information about the structure of the program being staged. The abstractions used by LMS itself to represent the IR and the relationship between symbols and definitions get in the way of the debugger. A general purpose debugger is therefore not practical when it comes to LMS.
 
 ## IR ordering
-As we have seen in previous sections, the "sea of nodes" representation used by LMS for its IR enables some powerful optimizations. Since there is no explicit ordering of the statements until a traversal is required, it allows the scheduler to reorder statements and reduce frequency of execution of expensive operation by hoisting them out of their scope.
+As we have seen in previous sections, the "sea of nodes" representation used by LMS for its IR enables some powerful optimizations. Since there is no explicit ordering of the statements until a traversal is required, it allows the scheduler to reorder statements and reduce frequency of execution of expensive operations by hoisting them out of inner scopes.
 
 This representation however presents some unique challenges when debugging the code. Because all of the node dependencies are expressed by DSL authors through the `syms` function, it is vulnerable to human error. This means that a programming mistake can result in a bug that would cause the scheduler to produce some invalid ordering. We soon realized that finding the root cause of this type of error can be challenging.
 
@@ -46,7 +46,7 @@ By providing the source folders, the tool can examine the source and figure out 
 scala> Hit breakpoint at CodeMotion.scala:14
 ```
 
-We then provide two different api's that can be used to inspect the state of the target. By using the `scala.Dynamic` type provide by scala, we are able to create a simple embedded language in the scala interpreter that can be used to retrieve values from the target process.
+We then provide two different apis that can be used to inspect the state of the target. By using the `scala.Dynamic` type provided by scala, we are able to create a simple embedded language in the scala interpreter that can be used to retrieve values from the target process.
 
 ```scala
 scala> p()
@@ -87,7 +87,7 @@ res6: List[Option[Int]] = List(Some(5), Some(6), ...)
 
 The second tool we present started as a simple visualization tool[^7] for transformation passes. By using it, we later discovered that it could also be used as a practical way to query useful information about the IR that can be used to debug transformations efficiently. 
 
-The tool is made of two separate part, a logger and a visualizer. The logger extracts the IR and all of the statements' dependencies along with their source information from LMS in a text format. This format can then easily be consumed by the visualizer to present useful information about the compilation pipeline. We designed it this way to decouple it from LMS's internal implementation. The only assumption we make is about the format of the IR. We believe that this assumption to be sound. Since a lot of project heavily rely on LMS, Delite being one example, the engineering effort needed to change the IR would be significant and thus unlikely. 
+The tool is made of two separate parts, a logger and a visualizer. The logger extracts the IR and all of the statements' dependencies along with their source information from LMS in a text format. This format can then easily be consumed by the visualizer to present useful information about the compilation pipeline. We designed it this way to decouple it from LMS's internal implementation. The only assumption we make is about the format of the IR. We believe that this assumption to be sound. Since a lot of project heavily rely on LMS, Delite being one example, the engineering effort needed to change the IR would be significant and thus unlikely. 
 
 To allow programmers familiar with LMS to modify our tool, we used `Scala.js`[^8] for our user interface. This removes the language barrier that might otherwise prevent other people from improving on our design.
 

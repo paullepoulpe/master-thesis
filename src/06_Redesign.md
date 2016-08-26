@@ -1,8 +1,8 @@
 # Redesigning Delite Ops
 
-As we've seen in the previous section, the generators form DMLL are represented as elems in Delite. We are now going to present how these elems are implemented in Delite. We will also show the limitations of DMLL and how the improvements in loop fusion help us get rid of these limitations.
+We have seen in the previous section, the generators from DMLL are represented as elems in Delite. We now present how these `Elem`s are implemented in Delite. We also show the limitations of DMLL and how the improvements in loop fusion help us get rid of these limitations.
 
-In the following code, we can see the encoding that Delite has used until now.
+In the following code, we see the encoding that Delite has used until now.
 
 ```scala
 // Base trait for all loop elems in Delite
