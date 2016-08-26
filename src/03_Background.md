@@ -138,24 +138,38 @@ All of the dependencies to the `SoA` structure have been removed, and the `names
 ### Horizontal Loop Fusion
 The problem with the previous two optimizations alone is that now we have a potentially large number of loops that might be duplicating computation. If the elements of the original array shared some code, now this code is duplicated across all of the loops.
 
-To solve this problem we merge all of the loops iterating over the same range. All of the computations will thus be in the same scope and LMS's CSE optimization will take care of sharing the computation for all of the fields.
-
-Applying all of the optimizations described above to our example and lowering the result to our implementation of `Collect`, we obtain the following
+The following code for example:
 
 ```scala
-val ages: Coll[Int] = Array.fill(100){i => Disk.getAge(i)}
-val heights: Coll[Double] = Array.fill(100){i => Disk.getHeight(i)}
+def genPerson(seed: Int) = ... // expensive computation
+val population: Coll[PersonRecord] = Array.fill(100) { i =>
+    genPerson(i)
+}
+```
+Would be transformed in quite inefficient by the `SoA` transformer if the `genPerson` function is not inlined:
 
+```scala
+val names: Coll[String] = Array.fill(100){i => genPerson(i).name}
+val ages: Coll[Int] = Array.fill(100){i => genPerson(i).age}
+val heights: Coll[Double] = Array.fill(100){i => genPerson(i).height}
+```
+
+To solve this problem we merge all of the loops iterating over the same range. All of the computations will thus be in the same scope and LMS's CSE optimization will take care of sharing the computation for all of the fields.
+
+Applying all of the optimizations described above to our example and lowering the result to our implementation of `Collect`, we obtain the following:
+
+```scala
 val query1 = new Coll[Double]
 val query2 = new Coll[Double]
 
 for(i <- 0 until 100){
-    val h = heights(i)
-    query1 += h
-    if(ages(i) > 40) query2 += h
+    val height = Disk.getHeight(i)
+    query1 += height
+    val age = Disk.getAge(i)
+    if(age > 40) query2 += height
 }
 ```
-The computation of `h` is not duplicated across the loops anymore, and all reference to the `names` collection has disappeared.
+All reference to the `names` collection has disappeared. Furthermore, since the collections all iterate over the same range, the fusion algorithm can fuse them together and remove the need to build them in the first place.
 
 Next we will discuss in more details how these optimizations are implemented in the context of the our system. We will show how `MultiLoop`s are encoded in Delite, and how it had to be modified to take advantage of the improvements made in the loop fusion optimizations. We will also present some of the problems we have encountered while redesigning the framework and the tools we have created to help tackle similar problems in the future.
 
