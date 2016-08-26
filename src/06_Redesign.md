@@ -39,7 +39,7 @@ case class DeliteCollectElem[A, CA <: DeliteCollection[A]]]
     val eF: Option[Sym[DeliteCollection[A]]] = None
 }
 ```
-We immediately see what the first issue here is. The `MultiLoop` language as it is presented in [@eatperf] does not have enough expressive power to encode the semantics of flatmap. This leads to the strange encoding seen above, `iFunc` is set only in the cases where the operation produces a collection of elements per index of the loop. 
+We immediately see what the first issue here is. The `MultiLoop` language as it is presented in [@eatperf] does not have enough expressive power to encode the semantics of `flatmap`. This leads to the strange encoding seen above, `iFunc` is set only in the cases where the operation produces a collection of elements per index of the loop. 
 
 The second problem with the above encoding is not immediately obvious. The following example taken from [@betterfusion] illustrates the problem well.
 
@@ -90,7 +90,7 @@ for (indexVar <- 0 until 10) {
 
 This duplication of code is due to the fact that the function and condition are emitted separately. The scheduler has no way to know that it is actually duplicating computation.
 
-The work done by Vera Salvisberg in [@betterfusion] modifies the fusion algorithm in LMS to remove both these restrictions. It introduces the concept of `MultiCollect` as the base generator for loops. By default `MultiCollect` has the same semantics as flatmap in that it can produce multiple values on each iteration. But it can also be used to express filter and map as they are just specialized flatmap operations that produce one or less elements per iteration. This allows us to remove the need for an additional conditional field. It also provides the scheduler with all the information it needs to properly guard the computation of the current element while not duplicating computation.
+The work done by Vera Salvisberg in [@betterfusion] modifies the fusion algorithm in LMS to remove both these restrictions. It introduces the concept of `MultiCollect` as the base generator for loops. By default `MultiCollect` has the same semantics as `flatmap` in that it can produce multiple values on each iteration. But it can also be used to express filter and map as they are just specialized `flatmap` operations that produce one or less elements per iteration. This allows us to remove the need for an additional conditional field. It also provides the scheduler with all the information it needs to properly guard the computation of the current element while not duplicating computation.
 
 We update the Delite `MultiLoop` language to reflect this change:
 

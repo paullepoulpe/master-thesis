@@ -29,7 +29,7 @@ In the following sections, we present the tools that we create over the course o
 
 ## `lms-debugger`
 
-As a solution to our first problem, we propose a context-aware debugger for LMS[^5]. Using the general purpose scala-debugger project[^6] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to reify locally values from the target process.
+As a solution to our first problem, we propose a context-aware debugger for LMS[^5]. Using the general purpose `scala-debugger` project[^6] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to reify locally values from the target process.
 
 The most basic feature the tool provides is, like any other debugger, the ability to stop the target code at any point.
 
@@ -99,7 +99,7 @@ transformer, in theory, there are no strong constraints on the kind of transform
 We also provide a command line interface to query the dependencies between nodes of the IR. It provides utilities to resolve definitions from symbols, find dependencies for a particular symbol, and find arbitrary dependency chains between symbols. As this is still a prototype, there is some room for progress. The limited functionality the tool proved to be very useful nevertheless.
 
 
-[^4]: Named from Heisenberg's Uncertainty Principle in quantum physics, a heiseinbug is a bug that disappears or alters its behavior when one attempts to probe or isolate it.
+[^4]: Named from Heisenberg's Uncertainty Principle in quantum physics, a heisenbug is a bug that disappears or alters its behavior when one attempts to probe or isolate it.
 [^5]: Available at https://github.com/Stanford-PDM/lms-debugger
 [^6]: Available at http://scala-debugger.org/
 [^7]: Available at https://github.com/Stanford-PDM/lms-visualisation

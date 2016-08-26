@@ -12,7 +12,7 @@
     - Talk about abstraction
     - Talk about delite and how it is great and allows you to do cool things
     - Talk about loop fusion and Soa
-    - on the way to loop fusion we discovered and adressed a need for better debugging / visualisation tools
+    - on the way to loop fusion we discovered and addressed a need for better debugging / visualization tools
 
 3. Background & Theory // and related work
     - Keep it short for each project
@@ -40,11 +40,11 @@
 
 5. Evaluation
     - amount of stuff that compiles -> was broken, is fixed
-    - benchmarks with and wihtout certain optimizations -> was slow, is fast
+    - benchmarks with and without certain optimizations -> was slow, is fast
 
 6. Future Work
     - Lowering code to loop language -> mirror Introduction
-    - Debugging and tooling future for staged programs (if I have time, find people who did simliar things )
+    - Debugging and tooling future for staged programs (if I have time, find people who did similar things )
 
 7. Conclusion
     - abstract + first paragraph of intro

@@ -157,5 +157,5 @@ for(i <- 0 until 100){
 ```
 The computation of `h` is not duplicated across the loops anymore, and all reference to the `names` collection has disappeared.
 
-Next we will discuss in more details how these optimizations are implemented in the context of the our system. We will show how multiloops are encoded in Delite, and how it had to be modified to take advantage of the improvements made in the loop fusion optimizations. We will also present some of the problems we have encountered while redesigning the framework and the tools we have created to help tackle similar problems in the future.
+Next we will discuss in more details how these optimizations are implemented in the context of the our system. We will show how `MultiLoop`s are encoded in Delite, and how it had to be modified to take advantage of the improvements made in the loop fusion optimizations. We will also present some of the problems we have encountered while redesigning the framework and the tools we have created to help tackle similar problems in the future.
 

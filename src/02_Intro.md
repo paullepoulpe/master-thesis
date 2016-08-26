@@ -12,7 +12,7 @@ Staging [@staging] using partial-evaluation [@tagless] is a powerful and scalabl
 
 Delite [@delite] is a multi staging optimizing compiler architecture that can take high-level programs and generate efficient low-level code that runs on different platforms. The programmer's interface into the framework is made of domain specific languages (DSL). It provides utilities for DSL authors to express domain specific optimizations, but it also comes with a set of generic transformers for optimizing data structures.
 
-LMS (Lightweight Modular Staging) is the library Delite relies on to lift user programs, transform the intermediate representation and generate code. It provides more generic optimizations such as CSE (common subexpression elimination), DCE (dead code elimination) and loop fusion.
+LMS (Lightweight Modular Staging) is the library Delite relies on to lift user programs, transform the intermediate representation and generate code. It provides more generic optimizations such as CSE (common sub-expression elimination), DCE (dead code elimination) and loop fusion.
 
 Recent work [@betterfusion] done on LMS updates the loop fusion optimization to get rid of several limitations that it had. Because of incompatible changes, Delite was however not able to profit from those updates and was stuck with the old version.
 
