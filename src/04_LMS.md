@@ -58,9 +58,9 @@ statements that will compose the program. It then sorts them in order such that 
 ## Blocks & Scopes
 If we want to generate efficient code, we need to be able to represent structured computations in our IR. Loops and conditional statements cannot be considered the same way as other definitions, because the dependency semantics is different than with other statements. 
 
-The problem becomes obvious when we look at the example we presented above. If we follow the naive scheduling algorithm, the  natural ordering of the IR would result in a valid schedule. We can notice however that both branches of the conditional are scheduled before the condition is even evaluated. This does not cause any inconsistencies in our toy example, however it may lead to unused expensive computations, or might alter the semantics of the original program if the branches contain side effects.
+The problem becomes obvious when we look at the example we presented above. If we follow the naive scheduling algorithm, the  natural ordering of the IR would result in a valid schedule. We can notice however that both branches of the conditional are scheduled before the condition is even evaluated. This does not cause any inconsistencies in our toy example, however it may lead to unused expensive computations. If one of the branches contains side effects, this is not only wasteful, but also illegal as it changes the semantics of the original program.
 
-To work around this problem, LMS provides a `Block` definition wrapper for a symbol. It does not contain any structural information other than the result statement of the block. A block carries the semantic information that its contents belong to a different scope and should thus be treated differently by the code generator.
+To work around this problem, LMS provides a `Block` definition wrapper for a symbol. It does not contain any structural information other than the result statement of the block. A block carries the semantic information that its contents belong to a different scope and should thus be treated differently by the scheduler.
 
 ## Transformers and Mirroring
 As we've seen in previous sections, LMS automatically performs some generic optimizations such as CSE and DCE. For more specific optimizations, LMS provides a transformation interface.
@@ -70,7 +70,8 @@ A transformer is defined at its core as a function from expression to expression
 Since the IR is immutable, mirroring does not actually modify any nodes but generates new ones. LMS users can take advantage of that fact by defining generator functions that can perform domain-specific optimizations. Depending on the updated dependencies, it might be possible to return a simplified version of the node. 
 
 When defining a simple language to add two integers for example, we might be able to fold certain operations when the operands are statically known.
-In the example below, the transformer performs the constant addition at compile time, replacing the original expression with the result, preventing unnecessary runtime addition.
+
+Given the `int_plus` generator and mirroring rule below:
 
 ```scala
 case class IntPlus(x: Exp[Int], y: Exp[Int]) extends Def[Int]
@@ -85,3 +86,35 @@ def mirror(e: Def[A], f: Transformer): Exp[A] = e match {
     case _ => super.mirror(e, f)
 }
 ```
+
+We can write a transformer that resolves the sizes of all collections statically [^lms1]:
+
+```scala
+case class ArraySize(arr: Exp[Array[Int]]) extends Def[Int]
+
+case class SizeResolver extends Transformer {
+    def apply[A](x: Exp[A]): Exp[A] = x match {
+        case Def(ArraySize(arr)) => Const(100) // all of our array have the same size
+        case _ => mirror(x, this)
+    }
+}
+```
+
+LMS can then take advantage of any constant folding opportunity.
+
+```scala
+val x = new Array(100)
+val res = x.size + 5
+```
+
+After lifting we have:
+
+```scala
+TP(Sym(1), ArrayNew(Const(100))
+TP(Sym(2), ArraySize(Sym(1)))
+TP(Sym(3), IntPlus(Sym(2), Const(5)))
+```
+
+After transformation this whole program collapses to `Const(105)` because the `int_plus` generator was able to statically fold the orignal `IntPlus` definition after the mirroring operation updated its dependencies.
+
+[^lms1]: the `Def` extractor is a utility that can be used to retrieve the definition associated with a symbol
