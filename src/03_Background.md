@@ -11,7 +11,7 @@ Due to its ability to strip abstraction and generate highly efficient code, MSP 
 
 ## Parallel patterns
 
-Design patterns are a well understood concept in software engineering. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are `MapReduce` [@mapreduce] and Spark [@spark].
+Design patterns are a well understood concept in software engineering [@designpatterns]. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are `MapReduce` [@mapreduce] and Spark [@spark].
 
 Delite [@delite] uses the `MultiLoop` formalism introduced in prior work [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Int` represents the type of the variable use to index the collection)
 
