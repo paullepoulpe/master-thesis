@@ -66,7 +66,9 @@ The problem appears when we try to generate the code:
 var cons = 0for (indexVar <- 0 until 10) {    val elemVal = indexVar - 2    val res = cons + 1.0/elemVal    val condition = (indexVar != 2)    if (condition) cons = res}
 ```
 
-Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the print statement is execute twice as often as it should.
+Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the `print` statement is execute twice as often as it should.[^3]
+
+[^3]: Scala has had a similar issue itself https://groups.google.com/forum/#!msg/scala-internals/sbvCLxPyDcA/6dr40vqUS40J  
 
 ```scala
 val prod = loop(10){i => {print(i); i + 1}
