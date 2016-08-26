@@ -28,7 +28,7 @@ f: Int => V             // value function
 r: (V, V) => V          // reduction function
 ```
 
-`Collect` accumulates all of the values generated and returns them as a collection. The condition function can guard the value function to prevent certain indices from being computed. It can be used to implement `map`, `zipWith`, `filter` or `flatmap`. The `Reduce` generator has an additional reduction function that is used to combine the generated values into a single result. It can be used to implement `sum` or `count`.
+`Collect` accumulates all of the values generated and returns them as a collection. The condition function can guard the value function to prevent certain indices from being computed. It can be used to implement `map`, `zipWith` or `filter`. The `Reduce` generator has an additional reduction function that is used to combine the generated values into a single result. It can be used to implement `sum` or `count`.
 The `BucketCollect` and `BucketReduce` generators use a key function to reduce and collect values into separate buckets. These operation can be used to implement the semantics of Google's `MapReduce` [@mapreduce].
 
 An example implementation of `Collect` could be the following
@@ -101,9 +101,18 @@ Functional style programming has many advantages. It is easier to reason about i
 
 Using the second query from our example, we can see that the collection that is being produced by the `Where` clause and consumed by the `Select` is never referenced anywhere else in the code. In these conditions, vertical fusion can merge the body of the producer into the consumer, and thus get rid of the intermediate structure in its entirety. 
 
-It is also no accident that we only used the first query in our `SoA` example. The chained operations in the second query prevent us from getting rid of the population, as the intermediate collection depends on the `population` variable.
+It is no accident that we only used the first query in our `SoA` example. The chained operations in the second query prevent us from getting rid of the population, as the intermediate collection depends on the `population` variable.
 
-Too visualize the effect of loop fusion we first need to give some implementation of `Where` and `Select` using our `MultiLoop` language.
+A simple rule for vertical loop fusion in DMLL might look like the example below (where `fused` is the result of fusion `consumer` and `producer`)
+
+```scala
+val producer = Collect(s1)(c1)(f1)
+val consumer = Collect(producer.size)(c2)(f2)
+
+val fused = Collect(s1)(c1 && c2)(f1 andThen f2)
+```
+
+To visualize the effect of loop fusion on our example above, we first need to give some implementation of `Where` and `Select` using our `MultiLoop` language.
 
 ```scala
 trait Coll[T] { 

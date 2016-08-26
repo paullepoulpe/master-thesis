@@ -4,7 +4,7 @@ In this section we present some of the problems we discovered working with delit
 ## `Sym` to `Def` relationship
 There are several techniques that can be used to examine why a program is misbehaving. 
 
-We call the first approach the "Logpocalypse" technique. This method consists of inserting additional code to the program that will print out the state we are interested in examining through the execution of the program. This has several drawbacks however: the first one is that we incur a compilation overhead everytime we want to inspect a different part of the state; another one is that some classes of bugs such as heisenbugs [^2] can be significantly harder to study with this approach.
+We call the first approach the "Logpocalypse" technique. This method consists of inserting additional code to the program that will print out the state we are interested in examining through the execution of the program. This has several drawbacks however: the first one is that we incur a compilation overhead everytime we want to inspect a different part of the state; another one is that some classes of bugs such as heisenbugs [^3] can be significantly harder to study with this approach.
 
 
 
@@ -31,23 +31,23 @@ In the follwoing sections, we present the tools that we create over the course o
 
 ## lms-debugger
 
-As a solution to our first problem, we propose a context-aware debugger for LMS[^3]. Using the general purpose scala-debugger project[^4] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to reify locally values from the target process.
+As a solution to our first problem, we propose a context-aware debugger for LMS[^4]. Using the general purpose scala-debugger project[^5] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to reify locally values from the target process.
 
 TODO: details of implementation ??
 
 ## lms-visualisation
 
-The second tool we present started as a simple visualisation tool[^5] for transformation passes. By using it, we later discovered that it could also be used as a practical way to query useful information about the IR that can be used to debug transformations efficiently. 
+The second tool we present started as a simple visualisation tool[^6] for transformation passes. By using it, we later discovered that it could also be used as a practical way to query useful information about the IR that can be used to debug transformations efficiently. 
 
 The tool is made of two separate part, a logger and a visualiser. The logger extracts the IR and all of the statemnts' dependencies along with their source information from LMS in a text format. This format can then easily be consumed by the visualiser to present useful information about the compilation pipeline. We designed it this way to decouple it from LMS's internal implementation. The only assumption we make is about the format of the IR. We believe that this assumption to be sound. Since a lot of project heavily rely on LMS, Delite being one example, the engineering effort needed to change the IR would be significant and thus unlikely. 
 
-To allow programmers familiar with LMS to modify our tool, we used `Scala.js`[^6] for our user interface. This removes the language barrier that might otherwise prevent other people from improving on our design. 
+To allow programmers familiar with LMS to modify our tool, we used `Scala.js`[^7] for our user interface. This removes the language barrier that might otherwise prevent other people from improving on our design. 
 
 We also provide a command line interface to query the dependencies between nodes of the IR. It provides utilities to resolve definitions from symbols, find dependencies for a particular symbol, and find arbitrary dependency chains between symbols. As this is still a prototype, there is some room for progress. The limited functionality the tool proved to be very useful nevertheless.
 
 
-[^2]: Named from Heisenberg's Uncertainty Principle in quantum physics, a heiseinbug is a bug that disappears or alters its behavior when one attempts to probe or isolate it.
-[^3]: Available at https://github.com/Stanford-PDM/lms-debugger
-[^4]: Available at http://scala-debugger.org/
-[^5]: Available at https://github.com/Stanford-PDM/lms-visualisation
-[^6]: Available at http://www.scala-js.org/
+[^3]: Named from Heisenberg's Uncertainty Principle in quantum physics, a heiseinbug is a bug that disappears or alters its behavior when one attempts to probe or isolate it.
+[^4]: Available at https://github.com/Stanford-PDM/lms-debugger
+[^5]: Available at http://scala-debugger.org/
+[^6]: Available at https://github.com/Stanford-PDM/lms-visualisation
+[^7]: Available at http://www.scala-js.org/

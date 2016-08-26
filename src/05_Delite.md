@@ -22,7 +22,6 @@ The main transformations phases performed by Delite are:
 ## Delite Ops
 
 To simplify the development of DSL's, Delite provides a large collection of reusable operations (ops). Those operations include, among other things, the Delite `MultiLoop` Language (DMLL) we presented in a previous section. This allows new ops to be created that use the core DMLL generators and are thus automatically supported by the compilation pipeline.
-*[SR: I don't remember seeing DMLL in previous section?  Was it in Intro?]*
 
 ### Elems
 To encode their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that define the semantics of the different operations and can be used as loop bodies. DMLL's generators are also encoded as `Elems`.
