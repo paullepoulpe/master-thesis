@@ -3,19 +3,37 @@
 # global dictionary is at the start, file overrides afterwards
 # one word per line, to define a file override use ' - filename'
 # where filename is relative to this configuration file
+
+# biblinks
 lms
 delite
-scala
-dsl
-tagless
-betterfusion
+optistructs
 eatperf
+betterfusion
+scalan
+tagless
+virtualization
+staging
+dsls
+mapreduce
+spark
+soa
+loopfusion
+debug
+
+# names
 Cédric
 Bastin
 Manohar
 Jonnalagedda
 Koeplinger
-virtualization
+Salvisberg
+
+# other
 runtime
 ast
 api
+elems
+logpocalypse
+heisenbugs
+heisenbug
