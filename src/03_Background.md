@@ -5,13 +5,13 @@
 A domain specific language (DSL), as opposed to a general purpose language, provides a high level of abstraction to the programmer. As the name implies, a DSL is composed of a series of constructs specific to a certain domain. This allows programmers to focus on their domain rather than the underlying implementation of the runtime. Due to their high level of abstraction, DSL's carry an abundance of semantic information. Compilers can take advantage of that information to perform domain-specific optimizations and select the best representation for the executable depending on the specificity of the hardware target [@dsls].
 
 ## Multi-stage programming
-Multi stage-programming (MSP), or dynamic code generation, is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. MSP splits computations into stages distiguished from one another by frequency of execution or avalability of data. This allows evaluating part of the computations early or reducing frequency of execution of other parts. 
+Multi stage-programming (MSP), or dynamic code generation, is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. MSP splits computations into stages distinguished from one another by frequency of execution or availability of data. This allows evaluating part of the computations early or reducing frequency of execution of other parts. 
 
 Due to its ability to strip abstraction and generate highly efficient code, MSP is especially well suited for performance oriented DSL compilation.
 
 ## Parallel patterns
 
-Design patterns are a well understood concept in software engineering. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are MapReduce [@mapreduce] and Spark [@spark].
+Design patterns are a well understood concept in software engineering. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are `MapReduce` [@mapreduce] and Spark [@spark].
 
 Delite [@delite] uses the `MultiLoop` formalism introduced in prior work [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. (in the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Int` represents the type of the variable use to index the collection)
 
@@ -44,9 +44,9 @@ for(i <- 0 until s){
 ```
 ## Optimizations
 
-The Delite MultiLoop Language (DMLL) formalism can be used to express a large number of parallel patterns from a small well defined core. This allows for some powerful transformations and optimizations to be expressed in a simple concise way. In this section we present three common optimization that are part of the Delite compilation pipeline: `ArrayOfStruct` to `StructOfArray`, vertical loop fusion and horizontal loop fusion. These transformations are not new ideas [@soa] [@loopfusion], however, they are essential in the context of Delite. They can remove dependencies between elements of strucured data as well as combine computations under the same scope to enable further optimizations.
+The Delite `MultiLoop` Language (DMLL) formalism can be used to express a large number of parallel patterns from a small well defined core. This allows for some powerful transformations and optimizations to be expressed in a simple concise way. In this section we present three common optimization that are part of the Delite compilation pipeline: `ArrayOfStruct` to `StructOfArray`, vertical loop fusion and horizontal loop fusion. These transformations are not new ideas [@soa] [@loopfusion], however, they are essential in the context of Delite. They can remove dependencies between elements of structured data as well as combine computations under the same scope to enable further optimizations.
 
-We will use the following snippet of code to illustrate the differents transformations a program goes through.
+We will use the following snippet of code to illustrate the different transformations a program goes through.
 
 ```scala
 case class PersonRecord(name: String, age: Int, height: Double)
@@ -62,16 +62,16 @@ val query1 = population.Select(_.height)
 val query2 = population.Where(_.age > 40).Select(_.height)
 ```
 
-This example is a typical example of what a data processing application could look like. We defined some strucure data to represent the model we are workign with, in this case a record representing a person. We then load a collection of those records from disk storage. Finally, we have two statements that query this collection to compute some result.
+This example is a typical example of what a data processing application could look like. We defined some structure data to represent the model we are working with, in this case a record representing a person. We then load a collection of those records from disk storage. Finally, we have two statements that query this collection to compute some result.
 
 The first thing we can notice is that the name field in the `PersonRecord` is never read by the query. In the naive implementation however, these fields have to be loaded from disk, parsed and carried around until they are discarded by the `Select` clause. This creates a computation and memory overhead that might not be negligible, especially if the size of the `name` field is significantly larger than the few bytes required to represent the other two fields.
 
 ### `ArrayOfStruct` to `StructofArray`
-High level data structures are an essential part of modern programming. Wheater designed for functional, imperative or object oriented programming, every language has a mechanism to create complex data strucures by grouping simpler ones (`C++`'s `struct`, `Java`'s `class`, `haskell`'s `Product` type). This very useful abstraction can however get in the way of compiler optimizations as it introduces some dependencies between parts of data.
+High level data structures are an essential part of modern programming. Whether designed for functional, imperative or object oriented programming, every language has a mechanism to create complex data structures by grouping simpler ones (`C++`'s `struct`, `Java`'s `class`, `haskell`'s `Product` type). This very useful abstraction can however get in the way of compiler optimizations as it introduces some dependencies between parts of data.
 
 Using a generic implementation of `Records` provided by LMS, Delite is able to understand  how that data is structured. This lets Delite to statically dispatch most field accesses and allows DCE to get rid of the unused fields. 
 
-`ArrayOfStruct` to `StructofArray` (`AoS` to `SoA`) or `MultiLoop` `SoA` is an extension of the mechanism described above that works on collection of `Records`. The transformation iterates over all of the patterns that produce a collection of structures and rewrites them to produce a single structure of collections, each one corresponting to a field in the original structure. It then marks the result to keep track of the transformation and rewrites the original collection's methods to work on the result of the transformation. Using the same mechanism as described above, it can rewrite accesses to the `SoA` representation by statically dispatching them.
+`ArrayOfStruct` to `StructofArray` (`AoS` to `SoA`) or `MultiLoop` `SoA` is an extension of the mechanism described above that works on collection of `Records`. The transformation iterates over all of the patterns that produce a collection of structures and rewrites them to produce a single structure of collections, each one corresponding to a field in the original structure. It then marks the result to keep track of the transformation and rewrites the original collection's methods to work on the result of the transformation. Using the same mechanism as described above, it can rewrite accesses to the `SoA` representation by statically dispatching them.
 
 Ignoring the second query from the example above, the transformation's result would look something like the following.
 

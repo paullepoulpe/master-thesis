@@ -8,4 +8,4 @@ no soa
 both
 
 with and without fusion
-with and wihtout soa
+with and without soa
