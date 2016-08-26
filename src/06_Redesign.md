@@ -23,8 +23,7 @@ case class DeliteCollectElem[A, CA <: DeliteCollection[A]]]
     val iF: Option[Sym[Int]] = None
     val sF: Option[Block[Int]] = None
     val eF: Option[Sym[DeliteCollection[A]]] = None
-} 
-
+}
 
 case class DeliteReduceElem[A] 
         extends Def[A] with DeliteLoopElem {
@@ -54,16 +53,17 @@ abstract class DeliteCollectBaseElem[A, O]
     val iFunc: Block[DeliteCollection[A]]
     val unknownOutputSize: Boolean
 
-    // bound symbol to hold the intermediate collection computed by iFunc
+    // symbol to hold the intermediate collection
     val eF: Sym[DeliteCollection[A]]
     
-    // inner loop index symbol to iterate over the intermediate collection
+    // symbol to iterate over the intermediate collection
     val iF: Sym[Int]
     
-    // size of the intermediate collection (range of inner loop)
+    // size of the intermediate collection
     val sF: Block[Int]
     
-    // element of the intermediate collection at the current inner loop index
+    // element of the intermediate collection at 
+    // the current inner loop index
     val aF: Block[A]
 }
 

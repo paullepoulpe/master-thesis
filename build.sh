@@ -38,14 +38,19 @@ for f in src/*.md; do
 done >> build/thesis.md;
 
 # Generate both pdf and tex (for inspection)
-PDF=build/thesis.pdf
-TEX=build/thesis.tex
+outputs=(pdf    tex     docx)
+formats=(latex  latex   '')
 
-for outfile in "$PDF" "$TEX"; do
-  echo -n "Compiling thesis to $outfile ..."
+for idx in "${!outputs[@]}"; do
+  outfile="build/thesis.${outputs[$idx]}"
+  format="${formats[$idx]}"
+  if [ ! -z $format ]; then
+    format="-t $format"
+  fi
+  echo -n "Compiling thesis to $outfile with ($format) ..."
   cat build/thesis.md |\
   sed -e "s%/g/png%/g/pdf%" |\
-  pandoc -f markdown -t latex \
+  pandoc -f markdown $format \
     --smart \
     --include-in-header=templates/break-sections.tex \
     --include-before-body=templates/titlepage.tex \
