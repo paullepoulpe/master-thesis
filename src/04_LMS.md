@@ -87,7 +87,7 @@ def mirror(e: Def[A], f: Transformer): Exp[A] = e match {
 }
 ```
 
-We can write a transformer that resolves the sizes of all collections statically [^lms1]:
+We can write a transformer that resolves the sizes of all collections statically [^1lms]:
 
 ```scala
 case class ArraySize(arr: Exp[Array[Int]]) extends Def[Int]
@@ -115,6 +115,6 @@ TP(Sym(2), ArraySize(Sym(1)))
 TP(Sym(3), IntPlus(Sym(2), Const(5)))
 ```
 
-After transformation this whole program collapses to `Const(105)` because the `int_plus` generator was able to statically fold the orignal `IntPlus` definition after the mirroring operation updated its dependencies.
+After transformation this whole program collapses to `Const(105)` because the `int_plus` generator was able to statically fold the original `IntPlus` definition after the mirroring operation updated its dependencies.
 
-[^lms1]: the `Def` extractor is a utility that can be used to retrieve the definition associated with a symbol
+[^1lms]: the `Def` extractor is a utility that can be used to retrieve the definition associated with a symbol

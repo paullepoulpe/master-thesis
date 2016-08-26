@@ -20,6 +20,14 @@ spark
 soa
 loopfusion
 debug
+designpatterns
+
+# footnotes
+1lms
+1back
+1delite
+1redesign
+2redesign
 
 # names
 Cédric
@@ -39,3 +47,5 @@ heisenbugs
 heisenbug
 composable
 scala
+inlined
+apis

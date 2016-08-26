@@ -26,9 +26,7 @@ To simplify the development of DSLs, Delite provides a large collection of reusa
 ### `DeliteLoopElem`s
 To encode their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that define the semantics of the different operations and can be used as loop bodies. DMLL's generators are also encoded as `Elems`.
 
-In the type hierarchy of Delite's `Elems` below, we can easily recognize our four DMLL generators [^1]. 
-
-[^1]: `BucketCollect` (resp. `BucketReduce`) is named `HashCollect` (resp. `HashReduce`) in the Delite context.
+In the type hierarchy of Delite's `Elems` below, we can easily recognize our four DMLL generators [^1delite]. 
 
 ![Delite Elems Hierarchy](https://www.dotty.ch/g/png?
   digraph G {
@@ -151,3 +149,5 @@ abstract class DeliteOpLoop[A] extends AbstractLoop[A]
     DeliteOpFlatMapI -> DeliteOpFlatMapLike;
   }
 )
+
+[^1delite]: `BucketCollect` (resp. `BucketReduce`) is named `HashCollect` (resp. `HashReduce`) in the Delite context.

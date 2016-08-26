@@ -47,12 +47,10 @@ The second problem with the above encoding is not immediately obvious. The follo
 val prod = arrayIf(10)({ i => i != 2 }, { i => i - 2 })val cons = prod.fold(0.0, { (x,y) => x + 1.0/y })
 ```
 
-The lowered consumer looks as follows [^2]
+The lowered consumer looks as follows [^1redesign]
 ```scalaSimpleLoop(prod.length, indexVar,    DeliteFoldElem(0, cons, elemVal,        { indexVar => prod.at(indexVar) }, // the map function        { indexVar => cons + 1.0/elemVal }, // the reduce function        Nil // no conditions yet    )
 )
 ```
-
-[^2]: `DeliteFoldElem` is a version of the `Reduce` generator that can express the more general fold operation.
 After vertical fusion:
 
 ```scalaSimpleLoop(10, indexVar,    DeliteFoldElem(0, cons, elemVal,        { indexVar => indexVar - 2 }, // fused map      
@@ -66,9 +64,9 @@ The problem appears when we try to generate the code:
 var cons = 0for (indexVar <- 0 until 10) {    val elemVal = indexVar - 2    val res = cons + 1.0/elemVal    val condition = (indexVar != 2)    if (condition) cons = res}
 ```
 
-Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the `print` statement is execute twice as often as it should.[^3]
+Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the `print` statement is execute twice as often as it should.[^2redesign]
 
-[^3]: Scala has had a similar issue itself https://groups.google.com/forum/#!msg/scala-internals/sbvCLxPyDcA/6dr40vqUS40J  
+ 
 
 ```scala
 val prod = loop(10){i => {print(i); i + 1}
@@ -166,3 +164,8 @@ case object CollectFlatMap extends DeliteCollectType
 def getCollectElemType(
         collect: DeliteCollectBaseElem[_,_]) : DeliteCollectType
 ```
+
+
+[^1redesign]: `DeliteFoldElem` is a version of the `Reduce` generator that can express the more general fold operation.
+
+[^2redesign]: Scala has had a similar issue itself https://groups.google.com/forum/#!msg/scala-internals/sbvCLxPyDcA/6dr40vqUS40J 
