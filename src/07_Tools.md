@@ -1,5 +1,5 @@
 # Tooling for Delite
-In this section we present some of the problems we discovered working with delite. We first explain why those challenges are unique to the architecture of a staging compiler. We then present solutions we designed and prototyped to tackle these challenges.
+This section presents some of the problems we discovered working with Delite. We first explain why those challenges are unique to the architecture of a staging compiler. We then present solutions we designed and prototyped to tackle these challenges.
 
 ## `Sym` to `Def` relationship
 There are several techniques that can be used to examine why a program is misbehaving. 
