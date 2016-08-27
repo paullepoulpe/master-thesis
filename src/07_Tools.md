@@ -61,7 +61,7 @@ currentScope = $colon$colon(
 )
 ```
 
-The second api is enhanced with semantics about certain types and utility functions. In the following snippet for example it can recognize a value of type `List` and reify it locally.
+The second API is enhanced with semantics about certain types and utility functions. In the following snippet for example it can recognize a value of type `List` and reify it locally.
 
 ```scala
 scala> &.currentScope
@@ -72,7 +72,7 @@ res4: List[org.lmsdbg.utils.DynamicWrappers.LMSValueScope] =
 List(class Expressions$TP{sym = Sym(5), rhs = Instance of scal ...
 ```
 
-By installing a hook on the definition registration function of LMS, the tool is able to track the relationship between symbols and definitions. When it encounters a value of type `Sym`, it uses that information to automatically retrieve the corresponding definition. In case we actually wanted to inspect the symbol, we provide a helper function that can be used to retrieve the symbol identifier.
+By installing a hook on the definition registration function of LMS, the tool is able to track the relationship between symbols and definitions. When it encounters a value of type `Sym`, it uses that information to automatically retrieve the corresponding definition. In case we actually want to inspect the symbol, we provide a helper function that can be used to retrieve the symbol identifier.
 
 ```scala
 scala> &.currentScope.asList.map(_.sym)
@@ -87,11 +87,11 @@ res6: List[Option[Int]] = List(Some(5), Some(6), ...)
 
 The second tool we present started as a simple visualization tool[^7] for transformation passes. By using it, we later discovered that it could also be used as a practical way to query useful information about the IR that can be used to debug transformations efficiently. 
 
-The tool is made of two separate parts, a logger and a visualizer. The logger extracts the IR and all of the statements' dependencies along with their source information from LMS in a text format. This format can then easily be consumed by the visualizer to present useful information about the compilation pipeline. We designed it this way to decouple it from LMS's internal implementation. The only assumption we make is about the format of the IR. We believe that this assumption to be sound. Since a lot of project heavily rely on LMS, Delite being one example, the engineering effort needed to change the IR would be significant and thus unlikely. 
+The tool is made of two separate parts, a logger and a visualizer. The logger extracts the IR and all of the statements' dependencies along with their source information from LMS in a text format. This format can then easily be consumed by the visualizer to present useful information about the compilation pipeline. We designed it this way to decouple it from LMS's internal implementation. The only assumption we make is about the format of the IR. We believe this assumption to be sound. Since many projects heavily rely on LMS---Delite being one example---the engineering effort needed to change the IR would be significant and thus unlikely. 
 
 To allow programmers familiar with LMS to modify our tool, we used `Scala.js`[^8] for our user interface. This removes the language barrier that might otherwise prevent other people from improving on our design.
 
-Using the generate trace, our tool produces a graphical interface presenting a representation of the compilation pipeline. The user can inspect the current transformation or move to the next one. Each transformation is represented as two semi-structured list of statements. Each list corresponds to a valid schedule of the program, one before, and the other after the transformation. The lists are semi structured, because they only present the statements that are in the top most scope of the IR. By clicking on an element, we expose the statements in the inner scopes of that definition. 
+Using the generate trace, our tool produces a graphical interface presenting a representation of the compilation pipeline. The user can inspect the current transformation or move to the next one. Each transformation is represented as two semi-structured lists of statements. Each list corresponds to a valid schedule of the program, one before, and the other after the transformation. The lists are semi-structured, because they only present the statements that are in the topmost scope of the IR. By clicking on an element, we expose the statements in the inner scopes of that definition. 
 
 Even though we have not run into any transformer that was not a substitution
 transformer, in theory, there are no strong constraints on the kind of transformers that can be expressed with LMS. To understand the effects of a transformer despite this limitation, we use the `SourceContext` information available in each symbol of the IR. Since each symbol tracks the transformations it has gone through during compilation, we can perform a simple comparison to understand how symbols are related across transformer passes. Using this simple mechanism, the tool will highlight all of the statements that might be related to the current focused statement. It will also expand any scope necessary to make related symbols visible.
