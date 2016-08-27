@@ -46,7 +46,7 @@ By providing the source folders, the tool can examine the source and figure out 
 scala> Hit breakpoint at CodeMotion.scala:14
 ```
 
-We then provide two different apis that can be used to inspect the state of the target. By using the `scala.Dynamic` type provided by scala, we are able to create a simple embedded language in the scala interpreter that can be used to retrieve values from the target process.
+We then provide two different APIs that can be used to inspect the state of the target. By using the `scala.Dynamic` type provided by scala, we are able to create a simple embedded language in the Scala interpreter that can be used to retrieve values from the target process.
 
 ```scala
 scala> p()
