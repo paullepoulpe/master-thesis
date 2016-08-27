@@ -64,7 +64,7 @@ val query2 = population.Where(_.age > 40).Select(_.height)
 
 We define some structure data to represent the model we are working with, in this case a record representing a person. We then load a collection of those records from some disk storage abstraction . Finally, we have two statements that query this collection to compute some result.
 
-The first thing we can notice is that the name field in the `PersonRecord` is never read by the query. In the naive implementation however, these fields have to be loaded from disk, parsed and carried around until they are discarded by the `Select` clause. This creates a computation and memory overhead that might not be negligible, especially if the size of the `name` field is significantly larger than the few bytes required to represent the other two fields.
+The first thing we can notice is that the name field in the `PersonRecord` is never read by the query. In the naive implementation however, these fields still get loaded from disk, parsed and carried around until they are discarded by the `Select` clause. This creates a computation and memory overhead that might not be negligible, especially if the size of the `name` field is significantly larger than the few bytes required to represent the other two fields.
 
 ### `ArrayOfStruct` to `StructofArray`
 High level data structures are an essential part of modern programming. Whether designed for functional, imperative or object oriented programming, every language has a mechanism to create complex data structures by grouping simpler ones (`C++`'s `struct`, `Java`'s `class`, `haskell`'s `Product` type). This very useful abstraction can however get in the way of compiler optimizations as it introduces some dependencies between parts of data.
