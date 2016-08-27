@@ -29,7 +29,7 @@ In the following sections, we present the tools that we created over the course 
 
 ## `lms-debugger`
 
-As a solution to our first problem, we propose a context-aware debugger for LMS[^5]. Using the general purpose `scala-debugger` project[^6] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to reify locally values from the target process.
+As a solution to our first problem, we propose a context-aware debugger for LMS[^5]. Using the general purpose `scala-debugger` project[^6] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to locally reify values from the target process.
 
 The most basic feature the tool provides is, like any other debugger, the ability to stop the target code at any point.
 
