@@ -1,6 +1,6 @@
 # Redesigning Delite Ops
 
-We have seen in the previous section, the generators from DMLL are represented as elems in Delite. We now present how these `Elem`s are implemented in Delite. We also show the limitations of DMLL and how the improvements in loop fusion help us get rid of these limitations.
+As we saw in the previous section, the generators from DMLL are represented as `elem`s in Delite. We now present how these `elem`s are implemented. We also show the limitations of DMLL and how the improvements in loop fusion help us get rid of these limitations.
 
 In the following code, we see the encoding that Delite has used until now.
 
@@ -44,24 +44,44 @@ We immediately see what the first issue here is. The `MultiLoop` language as it 
 The second problem with the above encoding is not immediately obvious. The following example taken from [@betterfusion] illustrates the problem well.
 
 ```scala
-val prod = arrayIf(10)({ i => i != 2 }, { i => i - 2 })val cons = prod.fold(0.0, { (x,y) => x + 1.0/y })
+val prod = arrayIf(10)({ i => i != 2 }, { i => i - 2 })
+val cons = prod.fold(0.0, { (x,y) => x + 1.0/y })
 ```
 
 The lowered consumer looks as follows [^1redesign]
-```scalaSimpleLoop(prod.length, indexVar,    DeliteFoldElem(0, cons, elemVal,        { indexVar => prod.at(indexVar) }, // the map function        { indexVar => cons + 1.0/elemVal }, // the reduce function        Nil // no conditions yet    )
+
+```scala
+SimpleLoop(prod.length, indexVar,
+    DeliteFoldElem(0, cons, elemVal,
+        { indexVar => prod.at(indexVar) }, // the map function
+        { indexVar => cons + 1.0/elemVal }, // the reduce function
+        Nil // no conditions yet
+    )
 )
 ```
-After vertical fusion:
 
-```scalaSimpleLoop(10, indexVar,    DeliteFoldElem(0, cons, elemVal,        { indexVar => indexVar - 2 }, // fused map      
-        { indexVar => cons + 1.0/elemVal },         List(indexVar != 2) // added condition
+After vertical fusion:
+
+```scala
+SimpleLoop(10, indexVar,
+    DeliteFoldElem(0, cons, elemVal,
+        { indexVar => indexVar - 2 }, // fused map      
+        { indexVar => cons + 1.0/elemVal }, 
+        List(indexVar != 2) // added condition
     )
 )
 ```
 
 The problem appears when we try to generate the code:
-```scala
-var cons = 0for (indexVar <- 0 until 10) {    val elemVal = indexVar - 2    val res = cons + 1.0/elemVal    val condition = (indexVar != 2)    if (condition) cons = res}
+
+```scala
+var cons = 0
+for (indexVar <- 0 until 10) {
+    val elemVal = indexVar - 2
+    val res = cons + 1.0/elemVal
+    val condition = (indexVar != 2)
+    if (condition) cons = res
+}
 ```
 
 Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the `print` statement is execute twice as often as it should.[^2redesign]
