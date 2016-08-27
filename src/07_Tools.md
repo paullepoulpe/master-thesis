@@ -21,11 +21,11 @@ The single most common symptom of this class of bug is an order violation of eff
 ## Phase separation
 LMS uses type information to differentiate between values of different stages (`Rep[T]` vs `T`). Every element that is not of the form `Rep[T]` becomes a constant in subsequent stages. While LMS enforces strict separation between stages, there are still potentially several transformations happening within the same stage. Following common terminology in the compiler community we will call the result obtained between transformations a phase.
 
-Because of its immutable "sea of nodes" representation. There is no clear separation between different phases of a single stage. As we have discussed in a previous chapter, each transformer doesn't create a well defined set of statements for each phase, it only adds new transformed and mirrored statement to the global set for the current stage.
+Because of its immutable "sea of nodes" representation, there is no clear separation between different phases of a single stage. As we have discussed in a previous chapter, each transformer doesn't create a well defined set of statements for each phase, it only adds new transformed and mirrored statement to the global set for the current stage.
 
 When working with program transformations, this can become a real challenge. The substitutions and transformations are not apparent when inspecting the list of statements composing the IR.
 
-In the following sections, we present the tools that we create over the course of this project to address the issues presented above.
+In the following sections, we present the tools that we created over the course of this project to address the issues presented above.
 
 ## `lms-debugger`
 
