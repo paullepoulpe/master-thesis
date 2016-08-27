@@ -1,0 +1,5 @@
+The files in this folder are templates to be included at the top of gnuplot
+scripts
+
+The only variable that can be set is %filename% that should be set as the
+filename of the output wanted (without extension)

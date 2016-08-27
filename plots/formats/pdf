@@ -1,0 +1,2 @@
+set term postscript eps enhanced color 
+set output '|ps2pdf -dEPSCrop - %filename%.pdf'

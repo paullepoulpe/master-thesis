@@ -48,11 +48,16 @@ elif [ $batch_spellcheck = true ]; then
   mdspell --report --ignore-acronyms --en-us src/*.md
 fi
 
+# Build the plots
+echo "Building plots"
+cd plots
+./build.sh
+cd ..
+
 # Concatenate all files with space in between
-rm -f build/thesis.md
 for f in src/*.md; do 
   cat "${f}"; echo; echo;
-done >> build/thesis.md;
+done > build/thesis_raw.md;
 
 # Generate documents for all output formats 
 for idx in "${!outputs[@]}"; do
@@ -61,9 +66,15 @@ for idx in "${!outputs[@]}"; do
   if [ ! -z $format ]; then
     format="-t $format"
   fi
+
+  # Update all the links to be pdf instead of png
+  cat build/thesis_raw.md | \
+    sed -e "s|/g/png|/g/pdf|g" |\
+    sed -e "s|../plots/out/\(.*\)\.png|plots/out/\1|g" \
+    > build/thesis.md
+
   echo -n "Compiling thesis to $outfile ($format) ..."
   cat build/thesis.md |\
-  sed -e "s%/g/png%/g/pdf%" |\
   pandoc -f markdown $format \
     --smart \
     --include-in-header=templates/break-sections.tex \
