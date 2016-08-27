@@ -10,7 +10,7 @@ trait DeliteLoopElem {
     val numDynamicChunks:Int
 }
 
-// Collect generator, 
+// Collect generator
 case class DeliteCollectElem[A, CA <: DeliteCollection[A]]] 
         extends Def[CA] with DeliteLoopElem {
     type I <: DeliteCollection[A]
@@ -19,7 +19,7 @@ case class DeliteCollectElem[A, CA <: DeliteCollection[A]]]
     val func: Block[A]
     val cond: List[Block[Boolean]] = Nil
     
-    // the output collection
+    // The output collection
     val par: DeliteParallelStrategy
     val buf: DeliteBufferElem[A,I,CA]
     
