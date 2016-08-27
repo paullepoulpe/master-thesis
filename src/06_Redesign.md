@@ -84,7 +84,7 @@ for (indexVar <- 0 until 10) {
 }
 ```
 
-Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the `print` statement is execute twice as often as it should.[^2redesign]
+Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the `print` statement is executed twice as often as it should [^2redesign].
 
  
 
