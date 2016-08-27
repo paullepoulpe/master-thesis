@@ -39,9 +39,9 @@ case class DeliteCollectElem[A, CA <: DeliteCollection[A]]]
     val eF: Option[Sym[DeliteCollection[A]]] = None
 }
 ```
-We immediately see what the first issue here is. The `MultiLoop` language as it is presented in [@eatperf] does not have enough expressive power to encode the semantics of `flatmap`. This leads to the strange encoding seen above, `iFunc` is set only in the cases where the operation produces a collection of elements per index of the loop. 
+We immediately see what the first issue here is. The `MultiLoop` language as presented in [@eatperf] does not have enough expressive power to encode the semantics of `flatmap`. This leads to the strange encoding seen above, where `iFunc` is set only in the cases where the operation produces a collection of elements per index of the loop. 
 
-The second problem with the above encoding is not immediately obvious. The following example taken from [@betterfusion] illustrates the problem well.
+The second problem with the above encoding is less obvious. The following example taken from [@betterfusion] illustrates the problem well.
 
 ```scala
 val prod = arrayIf(10)({ i => i != 2 }, { i => i - 2 })
