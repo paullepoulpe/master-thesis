@@ -1,6 +1,7 @@
 # output directories
 build/
-plots/out/
+plots/out/*
+!plots/out/*.png
 
 # Converted images 
 images/*converted-to*
