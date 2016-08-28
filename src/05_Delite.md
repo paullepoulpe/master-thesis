@@ -25,9 +25,9 @@ The main transformations phases performed by Delite are:
 To simplify the development of DSLs, Delite provides a large collection of reusable operations (ops). Those operations include, among other things, the Delite `MultiLoop` Language (DMLL) we presented in a previous section. This allows new ops to be created that use the core DMLL generators and are thus automatically supported by the compilation pipeline.
 
 ### `DeliteLoopElem`s
-To encode their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that are used as loop bodies. An `Elem` defines the semantics of the loop. It encodes the output type of the loop: `DeliteCollectElem` will produce a collection of values, whereas `DeliteReduceElem` will produce a single value. It also contrains the kind of operations allowed inside the loop: an instance of `DeliteForeachElem` can cause arbitrary side effects whereas the effects caused by a `DeliteReduceElem` are limited to modifying its accumulator. 
+To encode their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that are used as loop bodies. An `Elem` defines the semantics of the loop. It encodes the output type of the loop: `DeliteCollectElem` will produce a collection of values, whereas `DeliteReduceElem` will produce a single value. It also constrains the kind of operations allowed inside the loop: an instance of `DeliteForeachElem` can cause arbitrary side effects whereas the effects caused by a `DeliteReduceElem` are limited to modifying its accumulator. 
 
-All of the DMLL generators are encoded using `Elems`. Other kind of operations are supported too. However, the support for fusion is limited for those operations. We can easily recognize our four DMLL generators in the inheritence hierarchy below[^1delite].
+All of the DMLL generators are encoded using `Elems`. Other kind of operations are supported too. However, the support for fusion is limited for those operations. We can easily recognize our four DMLL generators in the inheritance hierarchy below[^1delite].
 
 ![Delite `Elem`s Hierarchy](https://www.dotty.ch/g/png?
   digraph G {
