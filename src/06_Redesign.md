@@ -1,6 +1,10 @@
 # Redesigning Delite Ops
 **[SR]: So, uh...where is your contribution?  I assume it's somewhere in Chapter 6?  You should (textually) point at it somehow and say "By the way, this is the new stuff that didn't exist before.  Things were broken before this existed, and now they're not broken."  But, you know, phrased better and such.**
 
+**Mano: alors je proposerais une intro qui dit kkch de la sorte
+que Vera avait propose une operation generique basee sur flatMap, qui (comme montrent les lois) englobe map et filter aussi
+et que ton travail a ete de l'integrer a Delite de maniere a faire fonctionner toute l'infrstructure et les tests**
+
 
 As we saw in the previous section, the generators from DMLL are represented as `Elem`s in Delite. We now present how these `Elem`s are implemented. We also show the limitations of DMLL and how the improvements in loop fusion help us get rid of these limitations.
 

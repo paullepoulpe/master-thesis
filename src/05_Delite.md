@@ -1,9 +1,5 @@
 # The Delite Compiler Architecture
 
-**Mano: alors je proposerais une intro qui dit kkch de la sorte
-que Vera avait propose une operation generique basee sur flatMap, qui (comme montrent les lois) englobe map et filter aussi
-et que ton travail a ete de l'integrer a Delite de maniere a faire fonctionner toute l'infrstructure et les tests**
-
 Delite [@delite] is a compiler framework built to enable the development of Domain Specific Languages (DSL). The DSL can then be used to implement high performance applications that compile to various languages (Scala, C++, CUDA) running
 on heterogeneous architectures (CPU /GPU). 
 
