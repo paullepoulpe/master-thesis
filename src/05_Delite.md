@@ -25,49 +25,49 @@ The main transformations phases performed by Delite are:
 To simplify the development of DSLs, Delite provides a large collection of reusable operations (ops). Those operations include, among other things, the Delite `MultiLoop` Language (DMLL) we presented in a previous section. This allows new ops to be created that use the core DMLL generators and are thus automatically supported by the compilation pipeline.
 
 ### `DeliteLoopElem`s
-To encode their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that define the semantics of the different operations and can be used as loop bodies. DMLL's generators are also encoded as `Elems`.
+To encode their ops, Delite defines a set of basic IR nodes (`DeliteOpsIR`) called `Elems` that are used as loop bodies. An `Elem` defines the semantics of the loop. It encodes the output type of the loop: `DeliteCollectElem` will produce a collection of values, whereas `DeliteReduceElem` will produce a single value. It also contrains the kind of operations allowed inside the loop: an instance of `DeliteForeachElem` can cause arbitrary side effects whereas the effects caused by a `DeliteReduceElem` are limited to modifying its accumulator. 
 
-In the type hierarchy of Delite's `Elems` below, we can easily recognize our four DMLL generators [^1delite]. 
+All of the DMLL generators are encoded using `Elems`. Other kind of operations are supported too. However, the support for fusion is limited for those operations. We can easily recognize our four DMLL generators in the inheritence hierarchy below[^1delite].
 
-![Delite Elems Hierarchy](https://www.dotty.ch/g/png?
+![Delite `Elem`s Hierarchy](https://www.dotty.ch/g/png?
   digraph G {
     rankdir=BT;
     node[shape=box,style=filled];
     Def [color=gray];
     ;
-    DeliteLoopElem [color= salmon];
+    LoopElem [color= salmon];
     ;
-    DeliteHashElem [color=salmon];
-    DeliteHashElem -> Def;
+    HashElem [color=salmon];
+    HashElem -> Def;
     ;
-    DeliteHashIndexElem [color=salmon];
-    DeliteHashIndexElem -> DeliteHashElem;
-    DeliteHashIndexElem -> DeliteLoopElem;
+    HashIndexElem [color=salmon];
+    HashIndexElem -> HashElem;
+    HashIndexElem -> LoopElem;
     ;
-    DeliteCollectBaseElem [color=salmon];
-    DeliteCollectBaseElem -> Def;
-    DeliteCollectBaseElem -> DeliteLoopElem;
+    CollectBaseElem [color=salmon];
+    CollectBaseElem -> Def;
+    CollectBaseElem -> LoopElem;
     ;
-    DeliteFoldElem [color=salmon];
-    DeliteFoldElem -> DeliteCollectBaseElem;
+    FoldElem [color=salmon];
+    FoldElem -> CollectBaseElem;
     ;
-    DeliteReduceElem [color=salmon];
-    DeliteReduceElem -> DeliteCollectBaseElem;
+    ReduceElem [color=salmon];
+    ReduceElem -> CollectBaseElem;
     ;
-    DeliteCollectElem [color=salmon];
-    DeliteCollectElem -> DeliteCollectBaseElem;
+    CollectElem [color=salmon];
+    CollectElem -> CollectBaseElem;
     ;
-    DeliteHashReduceElem [color=salmon];
-    DeliteHashReduceElem -> DeliteHashElem;
-    DeliteHashReduceElem -> DeliteLoopElem;
+    HashReduceElem [color=salmon];
+    HashReduceElem -> HashElem;
+    HashReduceElem -> LoopElem;
     ;
-    DeliteHashCollectElem [color=salmon];
-    DeliteHashCollectElem -> DeliteHashElem;
-    DeliteHashCollectElem -> DeliteLoopElem;
+    HashCollectElem [color=salmon];
+    HashCollectElem -> HashElem;
+    HashCollectElem -> LoopElem;
     ;
-    DeliteForeachElem [color=salmon];
-    DeliteForeachElem -> Def;
-    DeliteForeachElem -> DeliteLoopElem;
+    ForeachElem [color=salmon];
+    ForeachElem -> Def;
+    ForeachElem -> LoopElem;
   }
 )
 
@@ -104,50 +104,41 @@ abstract class DeliteOpLoop[A] extends AbstractLoop[A]
   digraph G {
     rankdir=BT;
     node[shape=box,style=filled];
-    Def [color=gray];
-    ;
-    AbstractLoop [color=gray];
-    AbstractLoop -> Def;
-    ;
-    DeliteOp [color=salmon];
-    DeliteOp -> Def;
     ;
     DeliteOpLoop [color=salmon];
-    DeliteOpLoop -> AbstractLoop;
-    DeliteOpLoop -> DeliteOp;
     ;
-    DeliteOpCollectLoop [color=lightblue];
-    DeliteOpCollectLoop -> DeliteOpLoop;
+    CollectLoop [color=lightblue];
+    CollectLoop -> DeliteOpLoop;
     ;
-    DeliteOpFlatMapLike [color=lightblue];
-    DeliteOpFlatMapLike -> DeliteOpCollectLoop;
+    FlatMapLike [color=lightblue];
+    FlatMapLike -> CollectLoop;
     ;
-    DeliteOpFoldLike [color=lightblue];
-    DeliteOpFoldLike-> DeliteOpCollectLoop;
+    FoldLike [color=lightblue];
+    FoldLike-> CollectLoop;
     ;
-    DeliteOpReduceLike [color=lightblue];
-    DeliteOpReduceLike -> DeliteOpCollectLoop;
+    ReduceLike [color=lightblue];
+    ReduceLike -> CollectLoop;
     ;
-    DeliteOpForeach [color=lightblue]; 
-    DeliteOpForeach -> DeliteOpLoop
+    Foreach [color=lightblue]; 
+    Foreach -> DeliteOpLoop
     ;
-    DeliteOpHashCollectLike [color=lightblue];
-    DeliteOpHashCollectLike -> DeliteOpLoop;
+    HashCollectLike [color=lightblue];
+    HashCollectLike -> DeliteOpLoop;
     ;  
-    DeliteOpHashReduceLike [color=lightblue];
-    DeliteOpHashReduceLike -> DeliteOpLoop;
+    HashReduceLike [color=lightblue];
+    HashReduceLike -> DeliteOpLoop;
     ;
-    DeliteOpMapLike [color=lightblue];
-    DeliteOpMapLike -> DeliteOpFlatMapLike;
+    MapLike [color=lightblue];
+    MapLike -> FlatMapLike;
     ;
-    DeliteOpMapI [color=lightblue];
-    DeliteOpMapI -> DeliteOpMapLike;
+    MapI [color=lightblue];
+    MapI -> MapLike;
     ;
-    DeliteOpFilterI [color=lightblue];
-    DeliteOpFilterI -> DeliteOpFlatMapLike;
+    FilterI [color=lightblue];
+    FilterI -> FlatMapLike;
     ;
-    DeliteOpFlatMapI [color=lightblue];
-    DeliteOpFlatMapI -> DeliteOpFlatMapLike;
+    FlatMapI [color=lightblue];
+    FlatMapI -> FlatMapLike;
   }
 )
 
