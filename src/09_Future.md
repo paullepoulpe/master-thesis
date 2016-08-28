@@ -14,3 +14,7 @@ A DSL user should be able to trust that Delite is doing all it can to optimize t
 One can run the compiler twice with different settings, but the outputs might be vastly different. In addition, this method doesn't provide any measure of the optimizations performed (number of fused loops, number of `SoA`ed arrays).
 
 Extending the current set of tools to support that kind of analysis to be performed could be very useful. Not only reassuring the DSL author and users that their code is efficient, but also for Delite maintainers to make sure that any change they make does not cause a performance regression.
+
+// TODO: maybe talk about the fact that not everyone can run benchmarks
+
+// TODO: better heuristics for loop fusion

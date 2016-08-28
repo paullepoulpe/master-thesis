@@ -45,7 +45,7 @@ case class DeliteCollectElem[A, CA <: DeliteCollection[A]]]
     val eF: Option[Sym[DeliteCollection[A]]] = None
 }
 ```
-We immediately see what the first issue here is. The `MultiLoop` language as presented in [@eatperf] does not have enough expressive power to encode the semantics of `flatmap`. This leads to the strange encoding seen above, where `iFunc` is set only in the cases where the operation produces a collection of elements per index of the loop. 
+/*We immediately see what the first issue here is*/. The `MultiLoop` language as presented in [@eatperf] does not have enough expressive power to encode the semantics of `flatmap`. This leads to the strange encoding seen above, where `iFunc` is set only in the cases where the operation produces a collection of elements per index of the loop. 
 
 **[SR]: You have an example with ArrayIf and prod.fold...it probably wouldn't hurt to add a sentence or two saying what the code does, something like
 "The following example taken from [@betterfusion] illustrates the problem well.  The code iterates through an array of ten (x.y) pairs and, where (i != 2), sets x to be the inverse of y." [ Or whatever the hell it actually does :) ]**
