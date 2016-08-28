@@ -6,8 +6,7 @@ set datafile missing '-'
 set style data histograms
 set xtics  norangelimit
 set xtics   ()
-set title "TPCHQ1 running times in microseconds"
-set yrange [ 0 : 60 ] noreverse nowriteback
+set yrange [ 0 : 250 ] noreverse nowriteback
 x = 0.0
 plot 'data/TPCHQ1.dat' using 2:xtic(1) title columnheader(2), \
 for [i=3:5] '' using i title columnheader(i)

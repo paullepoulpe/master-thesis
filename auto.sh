@@ -3,5 +3,5 @@
 
 SRC_FOLDER=src
 
-fswatch -o "$SRC_FOLDER" | xargs -n1 ./build.sh --nospellcheck
+fswatch -o "$SRC_FOLDER" | xargs -n1 ./build.sh
 

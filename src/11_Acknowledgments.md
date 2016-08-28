@@ -1,9 +1,5 @@
 # Acknowledgments
 
-- Cédric Bastin
-- Stephen Richardson
-- Manohar Jonnalagedda
-- David Koeplinger
-- Kevin Brown
-- PPL lab
-
+I would like to thank Professor Kunle Olukotun and Professor Martin Odersky for following me closely during my work and giving me the opportunity to accomplish my Master thesis at Stanford University. Thanks to Kevin Brown and David Koeplinger, both PhD candidates at the PPL lab, I was able to have insightful discussions about my work and Delite. I would also like to thank Professor Tiark Rompf for being available to answer my questions about the inner workings of LMS. 
+Despite the large time difference, Manohar Jonnalagedda, PhD candidate at LAMP, was always available on hangouts to discuss directions to explore and give me advice on my project.
+Thanks to Dan Moreau for handling all the administrative procedures during my stay in Stanford. Special thanks to Stephen Richardson for being an awesome office mate and letting me use his academic expertise to improve the quality of this report. Finally I would like to thank Cédric Bastin for helping me with all of the steps that allowed me to come to Stanford.
