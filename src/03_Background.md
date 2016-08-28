@@ -11,9 +11,9 @@ Due to its ability to strip abstraction and generate highly efficient code, MSP 
 
 ## Parallel patterns
 
-Design patterns are a well understood concept in software engineering [@designpatterns]. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks for formalizing these patterns are `MapReduce` [@mapreduce] and Spark [@spark].
+Design patterns are a well understood concept in software engineering [@designpatterns]. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks that use this kind of pattern are `MapReduce` [@mapreduce] and Spark [@spark].
 
-Delite [@delite] uses the `MultiLoop` (also called Delite `MultiLoop`language, or DMLL) formalism introduced in prior work [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language. In the following snippet, type `Coll[V]` is a collection with elements of type `V` and `Int` represents the type of the variable used for the size and index of a collection.
+Delite [@delite] uses the `MultiLoop` (also called Delite `MultiLoop`language, or DMLL) formalism [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language: 
 
 ```scala
 Collect(s)(c)(f)               : Coll[V]
@@ -21,7 +21,7 @@ Reduce(s)(c)(f)(r)             : V
 BucketCollect(s)(c)(k)(f)      : Coll[Coll[V]]
 BucketReduce(s)(c)(k)(f)(r)    : Coll[V]
 ```
-where
+where type `Coll[V]` is a collection with elements of type `V` and `Int` represents the type of the variable used for the size and index of a collection. The other elements are represented below:
 
 ```scala
 s: Int                  // size of the loop
