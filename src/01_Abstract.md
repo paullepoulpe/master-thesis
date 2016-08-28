@@ -2,8 +2,6 @@
 
  
  
-## Outline (TODO: remove)
-
 1. Abstract
     - trailer of what you did, why it was cool and what you learned)
 

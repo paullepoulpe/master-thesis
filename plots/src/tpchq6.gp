@@ -6,7 +6,7 @@ set datafile missing '-'
 set style data histograms
 set xtics  norangelimit
 set xtics   ()
-set yrange [ 0 : 60 ] noreverse nowriteback
+set yrange [ 0 : 150 ] noreverse nowriteback
 x = 0.0
 plot 'data/TPCHQ6.dat' using 2:xtic(1) title columnheader(2), \
 for [i=3:5] '' using i title columnheader(i)
