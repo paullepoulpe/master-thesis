@@ -94,7 +94,8 @@ case class ArraySize(arr: Exp[Array[Int]]) extends Def[Int]
 
 case class SizeResolver extends Transformer {
     def apply[A](x: Exp[A]): Exp[A] = x match {
-        case Def(ArraySize(arr)) => Const(100) // all of our array have the same size
+        // all of our array have the same size
+        case Def(ArraySize(arr)) => Const(100)
         case _ => mirror(x, this)
     }
 }
