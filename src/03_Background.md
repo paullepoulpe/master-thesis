@@ -1,8 +1,10 @@
 # Background and Theory
 
 ## Domain-specific languages
+> "A domain-specific language (DSL) is a small, usually declarative, language that offers expressive power focused on a particular problem domain." [@dslhudak]
 
-A domain specific language (DSL), as opposed to a general purpose language, provides a high level of abstraction to the programmer. As the name implies, a DSL is composed of a series of constructs specific to a certain domain. This allows programmers to focus on their domain rather than the underlying implementation of the runtime. Due to their high level of abstraction, DSL's carry an abundance of semantic information. Compilers can take advantage of that information to perform domain-specific optimizations and select the best representation for the executable depending on the specificity of the hardware target [@dsls].
+A DSL, as opposed to a general purpose language, provides higher level semantics and restrictions to the programmer. Compilers can take advantage of that semantic information to perform domain-specific optimizations. High level operations also give more freedom to choose different implementations depending on the specificity of the hardware target [@dsls].
+
 
 ## Multi-stage programming
 Multi stage-programming (MSP), or dynamic code generation, is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. MSP splits computations into stages distinguished from one another by frequency of execution or availability of data. This allows evaluating part of the computations early or reducing frequency of execution of other parts. 
