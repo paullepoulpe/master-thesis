@@ -42,7 +42,6 @@
 
 6. Future Work
     - Lowering code to loop language -> mirror Introduction
-    - Debugging and tooling future for staged programs (if I have time, find people who did similar things )
-
+    - Debugging and tooling future for staged programs
 7. Conclusion
     - abstract + first paragraph of intro
