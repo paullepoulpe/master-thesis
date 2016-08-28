@@ -2,7 +2,7 @@
 **[SR]: So, uh...where is your contribution?  I assume it's somewhere in Chapter 6?  You should (textually) point at it somehow and say "By the way, this is the new stuff that didn't exist before.  Things were broken before this existed, and now they're not broken."  But, you know, phrased better and such.**
 
 
-As we have saw in the previous section, the generators from DMLL are represented as `Elem`s in Delite. We now present how these `Elem`s are implemented. We also show the limitations of DMLL and how the improvements in loop fusion help us get rid of these limitations.
+As we saw in the previous section, the generators from DMLL are represented as `Elem`s in Delite. We now present how these `Elem`s are implemented. We also show the limitations of DMLL and how the improvements in loop fusion help us get rid of these limitations.
 
 In the following code, we see the encoding that Delite has used until now.
 
@@ -41,13 +41,13 @@ case class DeliteCollectElem[A, CA <: DeliteCollection[A]]]
     val eF: Option[Sym[DeliteCollection[A]]] = None
 }
 ```
-We immediately see what the first issue here is. The `MultiLoop` language as it is presented in [@eatperf] does not have enough expressive power to encode the semantics of `flatmap`. This leads to the strange encoding seen above, `iFunc` is set only in the cases where the operation produces a collection of elements per index of the loop. 
+We immediately see what the first issue here is. The `MultiLoop` language as presented in [@eatperf] does not have enough expressive power to encode the semantics of `flatmap`. This leads to the strange encoding seen above, where `iFunc` is set only in the cases where the operation produces a collection of elements per index of the loop. 
 
 **[SR]: You have an example with ArrayIf and prod.fold...it probably wouldn't hurt to add a sentence or two saying what the code does, something like
 "The following example taken from [@betterfusion] illustrates the problem well.  The code iterates through an array of ten (x.y) pairs and, where (i != 2), sets x to be the inverse of y." [ Or whatever the hell it actually does :) ]**
 
 
-The second problem with the above encoding is not immediately obvious. The following example taken from [@betterfusion] illustrates the problem well.
+The second problem with the above encoding is less obvious. The following example taken from [@betterfusion] illustrates the problem well.
 
 ```scala
 val prod = arrayIf(10)({ i => i != 2 }, { i => i - 2 })val cons = prod.fold(0.0, { (x,y) => x + 1.0/y })
@@ -70,7 +70,7 @@ The problem appears when we try to generate the code:
 var cons = 0for (indexVar <- 0 until 10) {    val elemVal = indexVar - 2    val res = cons + 1.0/elemVal    val condition = (indexVar != 2)    if (condition) cons = res}
 ```
 
-Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the `print` statement is execute twice as often as it should.[^2redesign]
+Even though the original code did not cause any error, the generated code causes a division by zero. We can try to fix this problem by always emitting the code for the condition first, and executing the rest of the code conditionally. This might generate some erroneous code however in the cases where the consumer contains a conditional. In the example below, the `print` statement is executed twice as often as it should [^2redesign].
 
  
 
@@ -96,7 +96,7 @@ for (indexVar <- 0 until 10) {
 
 This duplication of code is due to the fact that the function and condition are emitted separately. The scheduler has no way to know that it is actually duplicating computation.
 
-The work done by Vera Salvisberg in [@betterfusion] modifies the fusion algorithm in LMS to remove both these restrictions. It introduces the concept of `MultiCollect` as the base generator for loops. By default `MultiCollect` has the same semantics as `flatmap` in that it can produce multiple values on each iteration. But it can also be used to express filter and map as they are just specialized `flatmap` operations that produce one or less elements per iteration. This allows us to remove the need for an additional conditional field. It also provides the scheduler with all the information it needs to properly guard the computation of the current element while not duplicating computation.
+The work done by Vera Salvisberg [@betterfusion] modifies the fusion algorithm in LMS to remove both these restrictions. It introduces the concept of `MultiCollect` as the base generator for loops. By default `MultiCollect` has the same semantics as `flatmap` in that it can produce multiple values on each iteration. But it can also be used to express `filter` and `map` as they are just specialized `flatmap` operations that produce one or less elements per iteration. This allows us to remove the need for an additional condition field. It also provides the scheduler with all the information it needs to properly guard the computation of the current element while not duplicating computation.
 
 We update the Delite `MultiLoop` language to reflect this change:
 
