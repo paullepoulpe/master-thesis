@@ -49,11 +49,12 @@ Fiszel
 runtime
 ast
 api
-elems
+apis
+cpus
 logpocalypse
 heisenbugs
 heisenbug
 composable
 scala
 inlined
-apis
+parallelizable
