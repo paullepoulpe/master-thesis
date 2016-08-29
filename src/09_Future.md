@@ -11,10 +11,11 @@ These changes would allow the code generation step to become a lot simpler as it
 ## Reporting tools
 A DSL user should be able to trust that Delite is doing all it can to optimize the program and generate efficient code. Currently however, there is no practical mechanism to verify what kind of optimizations have been run. 
 
-One can run the compiler twice with different settings, but the outputs might be vastly different. In addition, this method doesn't provide any measure of the optimizations performed (number of fused loops, number of `SoA`ed arrays).
+One can run the compiler twice with different settings, but the outputs might be vastly different. Another solution would be to run benchmarks to observe the effects of the transformations at runtime, however this might take a long time. Furthermore, neither of those methods provide any measure of the optimizations performed (number of fused loops, number of `SoA`ed arrays).
 
 Extending the current set of tools to support that kind of analysis to be performed could be very useful. Not only reassuring the DSL author and users that their code is efficient, but also for Delite maintainers to make sure that any change they make does not cause a performance regression.
 
-// TODO: maybe talk about the fact that not everyone can run benchmarks
+# Optimization benefits
+The experiments we performed revealed something interesting. On our example, fusion alone did not seem to provide any substantial benefits, sometimes actually adding some overhead to the code. This is surprising since vertical fusion removes intermediate collections, we would expect a net positive improvement compared to the baseline. Furthermore, fusion is enabled by default in Delite, which suggests that is it assumed be beneficial.
 
-// TODO: better heuristics for loop fusion
+Revisiting this assumption and understanding in details what conditions are required for loop fusion to provide faster resulting code could allow Delite to achieve higher performance.

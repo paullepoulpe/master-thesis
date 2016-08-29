@@ -1,10 +1,7 @@
 # Redesigning Delite Ops
-**[SR]: So, uh...where is your contribution?  I assume it's somewhere in Chapter 6?  You should (textually) point at it somehow and say "By the way, this is the new stuff that didn't exist before.  Things were broken before this existed, and now they're not broken."  But, you know, phrased better and such.**
+In her reimplementation of loop fusion for LMS, Vera Salvisberg proposes a new `flatMap` based IR for loop operations. She shows that this new model is general enough to capture the semantics of most collection operations with `map`and `filter` being only specific cases of `flatMap`. In this section we show how Delite's encoding of loops is changed to reflect those changes. We also present how these changes affect the `SoA` transformation as well as code generations. Other changes in Delite are not discussed.
 
-**Mano: alors je proposerais une intro qui dit kkch de la sorte
-que Vera avait propose une operation generique basee sur flatMap, qui (comme montrent les lois) englobe map et filter aussi
-et que ton travail a ete de l'integrer a Delite de maniere a faire fonctionner toute l'infrstructure et les tests**
-
+## Before
 
 As we saw in the previous section, the generators from DMLL are represented as `Elem`s in Delite. We now present how these `Elem`s are implemented. We also show the limitations of DMLL and how the improvements in loop fusion help us get rid of these limitations.
 
@@ -100,6 +97,7 @@ for (indexVar <- 0 until 10) {
 
 This duplication of code is due to the fact that the function and condition are emitted separately. The scheduler has no way to know that it is actually duplicating computation.
 
+## After
 The work done by Vera Salvisberg [@betterfusion] modifies the fusion algorithm in LMS to remove both these restrictions. It introduces the concept of `MultiCollect` as the base generator for loops. By default `MultiCollect` has the same semantics as `flatmap` in that it can produce multiple values on each iteration. But it can also be used to express `filter` and `map` as they are just specialized `flatmap` operations that produce one or less elements per iteration. This allows us to remove the need for an additional condition field. It also provides the scheduler with all the information it needs to properly guard the computation of the current element while not duplicating computation.
 
 We update the Delite `MultiLoop` language to reflect this change:
