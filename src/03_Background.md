@@ -7,6 +7,8 @@ A DSL, as opposed to a general purpose language, provides higher level semantics
 
 
 ## Multi-stage programming
+
+**[mano] MSP doesn't do any of that! it just makes it possible to spec stuff**
 Multi stage-programming (MSP), or dynamic code generation, is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. MSP splits computations into stages distinguished from one another by frequency of execution or availability of data. This allows evaluating part of the computations early or reducing frequency of execution of other parts. 
 
 Due to its ability to strip abstraction and generate highly efficient code, MSP is especially well suited for performance oriented DSL compilation.
