@@ -15,7 +15,7 @@ One can run the compiler twice with different settings, but the outputs might be
 
 Extending the current set of tools to support that kind of analysis to be performed could be very useful. Not only reassuring the DSL author and users that their code is efficient, but also for Delite maintainers to make sure that any change they make does not cause a performance regression.
 
-# Optimization benefits
+## Optimization benefits
 The experiments we performed revealed something interesting. On our example, fusion alone did not seem to provide any substantial benefits, sometimes actually adding some overhead to the code. This is surprising since vertical fusion removes intermediate collections, we would expect a net positive improvement compared to the baseline. Furthermore, fusion is enabled by default in Delite, which suggests that is it assumed be beneficial.
 
 Revisiting this assumption and understanding in details what conditions are required for loop fusion to provide faster resulting code could allow Delite to achieve higher performance.
