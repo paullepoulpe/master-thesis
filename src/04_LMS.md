@@ -4,7 +4,7 @@ To understand the design of the Delite framework, we first have to take a step b
 ## Sea of Nodes
 The format that LMS uses [@lms] for its IR is based on expression trees and single static assignments (SSA). More exactly, it uses what is called a "sea of nodes" representation. 
 
-The IR is composed of a collection of statements, or typed pairs (TP). Every pair contains a symbol and a definition. A symbol is a simple reference to the statement it defines. Definitions are used to express how expressions can be combined. Expressions are restricted to symbols and constants. The typing information is expressed using scala's type system and stored in a type class within each symbol.
+The IR is composed of a collection of statements, or typed pairs (TP). Every pair contains a symbol and a definition. A symbol is a simple reference to the statement it defines. Definitions are used to express how expressions can be combined. Expressions are restricted to symbols and constants. The typing information is expressed using Scala's type system and stored in a type class within each symbol.
 
 Here is a summary of the types used in the IR:
 
@@ -23,8 +23,7 @@ trait Def[+T]
 case class TP[+T](sym: Sym[T], rhs: Def[T])
 ```
 
-
-`Exp[T]` is an interface that represents an expression of type `T`. Constants and symbols are the only elements implementing that interface. Composite operations are defined using `Def`s and can only reference symbols or constants. All the symbols that are referenced by a definition are called its dependencies and get be queried through the `syms` function.
+`Exp[T]` is an interface that represents an expression of type `T`. Constants and symbols are the only elements implementing that interface. Composite operations are defined using `Def`s and can only reference symbols or constants. All the symbols that are referenced by a definition are called its dependencies and can be queried through the `syms` function.
 
 During program evaluation, each definition is associated with a symbol, and that symbol is returned in place of the value for use in subsequent operations (see [@virtualization] & [@tagless] for the mechanism through which this is achieved). This allows LMS to automatically perform common sub-expression elimination (CSE) on the IR. Every repeated definition in the user's program will be associated with the same symbol in the generated IR. To illustrate how it works, consider the following example.
 
@@ -49,16 +48,16 @@ TP(Sym(3), IntTimes(Sym(1), Const(3)))
 TP(Sym(4), IfThenElse(Sym(2), Sym(3), Sym(1)))
 ```
 
-As we can see, the computation for `x1` has not been duplicated for `x1bis` because it is the same, LMS returned `Sym(1)` in the `IfThenElse` definition.
+As we can see, the computation for `x1` has not been duplicated for `x1bis`. Because it is the same value, LMS returned `Sym(1)` instead of creating a new symbol for the `IfThenElse` definition.
 
 ## Scheduling
 Since there is no explicit ordering of statements in the IR, we need an additional step to generate code. This step is called scheduling. Starting from the result expression of the program, the scheduler walks the list of dependencies backwards to collect all of the 
 statements that will compose the program. It then sorts them in order such that any statement comes after its dependencies. The resulting schedule can then be used to generate code that will respect the semantics of the original program.
 
 ## Blocks & Scopes
-If we want to generate efficient code, we need to be able to represent structured computations in our IR. Loops and conditional statements cannot be considered the same way as other definitions, because the dependency semantics is different than with other statements. 
+If we want to generate efficient code, we need to be able to represent structured computations in our IR. Loops and conditional statements cannot be considered in the same way as other definitions, because the dependency semantics are different than with other statements. 
 
-The problem becomes obvious when we look at the example we presented above. If we follow the naive scheduling algorithm, the  natural ordering of the IR would result in a valid schedule. We can notice however that both branches of the conditional are scheduled before the condition is even evaluated. This does not cause any inconsistencies in our toy example, however it may lead to unused expensive computations. If one of the branches contains side effects, this is not only wasteful, but also illegal as it changes the semantics of the original program.
+The problem becomes obvious when we look at the example we presented above. If we follow the naive scheduling algorithm, the  natural ordering of the IR would result in a valid schedule. We can notice, however, that both branches of the conditional are scheduled before the condition is even evaluated. This does not cause any inconsistencies in our toy example. However, it may lead to unused expensive computations. If one of the branches contains side effects, it is not only wasteful, but also illegal, as it changes the semantics of the original program.
 
 To work around this problem, LMS provides a `Block` definition wrapper for a symbol. It does not contain any structural information other than the result statement of the block. A block carries the semantic information that its contents belong to a different scope and should thus be treated differently by the scheduler.
 
@@ -69,7 +68,7 @@ A transformer is defined at its core as a function from expression to expression
 
 Since the IR is immutable, mirroring does not actually modify any nodes but generates new ones. LMS users can take advantage of that fact by defining generator functions that can perform domain-specific optimizations. Depending on the updated dependencies, it might be possible to return a simplified version of the node. 
 
-When defining a simple language to add two integers for example, we might be able to fold certain operations when the operands are statically known.
+When defining a simple language to add two integers, for example, we might be able to fold certain operations when the operands are statically known.
 
 Given the `int_plus` generator and mirroring rule below:
 
