@@ -30,8 +30,6 @@ In the following sections, we present the tools that we created over the course 
 
 ## `lms-debugger`
 
-**[RUBEN] le debugging c'est moins clair ça manque d'exemple de real case debugging.**
-
 The first tool we present is a context-aware debugger for LMS[^5]. Using the general purpose `scala-debugger` project[^6] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to locally reify values from the target process.
 
 The most basic feature the tool provides is, like any other debugger, the ability to stop the target code at any point.
@@ -87,8 +85,6 @@ res6: List[Option[Int]] = List(Some(5), Some(6), ...)
 ```
 
 ## `lms-visualisation`
-
-**TODO: Create visualisation to include**
 
 The second tool we present started as a simple visualization tool[^7] for transformation passes. By using it, we later discovered that it could also be used as a practical way to query useful information about the IR that can be used to debug transformations efficiently. 
 
