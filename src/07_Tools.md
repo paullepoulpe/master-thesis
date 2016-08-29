@@ -1,38 +1,6 @@
 # Tooling for Delite
 
-**[SR]: Perhaps more important than the actual coding and debugging were the lessons learned along the way, problems we encountered and how we overcame those problems.  To that end, this section presents some of the problems we discovered working with Delite. We first explain why those challenges are unique to the architecture of a staging compiler. We then present solutions we designed and prototyped to tackle these challenges**
-
-
-**[SR]FYI what you call "logpocaplyspe" technique I call the "printf" technique...but I like your word better because it's so descriptive of the actual aftermath...**
-
-**Your first subsection is titled "Sym to Def Relationship."  Why!!?  There's nothing about that in there.  Seems like it should be something like "Methods for Debugging."  And then I would suggest taking this entire subsection and moving it further down, maybe to the end of the "Phase separation" subsection, where it would fit something like:**
-
-**"When working with program transformations, this can become a real challenge. The substitutions and transformations are not apparent when inspecting the list of statements composing the IR."**
-
-**"Existing Debug Methods Fall Short"**
-
-**"There are several techniques that can be used to examine why a program is misbehaving...."**
-
-**[include existing subsection here verbatim]**
-
-**"In the following sections, we present the tools that we created over the course of this project to address the issues presented above."**
-
-**"lms-debugger"**
-
-**"As a solution to our first problem, IR reordering, we propose ..."**
-**[continue as before]**
-
-This section presents some of the problems we discovered working with Delite. We first explain why those challenges are unique to the architecture of a staging compiler. We then present solutions we designed and prototyped to tackle these challenges.
-
-## `Sym` to `Def` relationship
-There are several techniques that can be used to examine why a program is misbehaving. 
-
-We call the first approach the "Logpocalypse" technique. This method consists of inserting additional code to the program that will print out the state we are interested in examining through the execution of the program. This has several drawbacks however: the first one is that we incur a compilation overhead every time we want to inspect a different part of the state; another one is that some classes of bugs such as heisenbugs [^4] can be significantly harder to study with this approach.
-
-A more powerful approach to tackle software bugs is by using a debugger. A debugger
-allows us to interrupt the program at the moment when a symptom occurs, and examine the program's internal state (local variables, call trace) that causes the symptom to occur.
-
-Both methods have their advantages [@debug]. However, the logging method is significantly easier to implement without the support of a specialized tool. Furthermore, because of the structure of the LMS framework, we found it is in practice quite difficult to extract useful information about the structure of the program being staged. The abstractions used by LMS itself to represent the IR and the relationship between symbols and definitions get in the way of the debugger. A general purpose debugger is therefore not practical when it comes to LMS.
+Perhaps more important than the actual coding and debugging were the lessons learned along the way, problems we encountered and how we overcame those problems. To that end, this section presents some of the problems we discovered working with Delite. We first explain why those challenges are unique to the architecture of a staging compiler. We then present solutions we designed and prototyped to tackle these challenges.
 
 ## IR ordering
 As we have seen in previous sections, the "sea of nodes" representation used by LMS for its IR enables some powerful optimizations. Since there is no explicit ordering of the statements until a traversal is required, it allows the scheduler to reorder statements and reduce frequency of execution for expensive operations by hoisting them out of inner scopes.
@@ -48,13 +16,23 @@ Because of its immutable "sea of nodes" representation, there is no clear separa
 
 When working with program transformations, this can become a real challenge. The substitutions and transformations are not apparent when inspecting the list of statements composing the IR.
 
+## Existing Debug Methods Fall Short
+There are several techniques that can be used to examine why a program is misbehaving. 
+
+We call the first approach the "logpocalypse" technique. This method consists of inserting additional code to the program that will print out the state we are interested in examining through the execution of the program. This has several drawbacks however: the first one is that we incur a compilation overhead every time we want to inspect a different part of the state; another one is that some classes of bugs such as heisenbugs [^4] can be significantly harder to study with this approach.
+
+A more powerful approach to tackle software bugs is by using a debugger. A debugger
+allows us to interrupt the program at the moment when a symptom occurs, and examine the program's internal state (local variables, call trace) that causes the symptom to occur.
+
+Both methods have their advantages [@debug]. However, the logging method is significantly easier to implement without the support of a specialized tool. Furthermore, because of the structure of the LMS framework, we found it is in practice quite difficult to extract useful information about the structure of the program being staged. The abstractions used by LMS itself to represent the IR and the relationship between symbols and definitions get in the way of the debugger. A general purpose debugger is therefore not practical when it comes to LMS.
+
 In the following sections, we present the tools that we created over the course of this project to address the issues presented above.
 
 ## `lms-debugger`
 
 **[RUBEN] le debugging c'est moins clair ça manque d'exemple de real case debugging.**
 
-As a solution to our first problem, we propose a context-aware debugger for LMS[^5]. Using the general purpose `scala-debugger` project[^6] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to locally reify values from the target process.
+The first tool we present is a context-aware debugger for LMS[^5]. Using the general purpose `scala-debugger` project[^6] to provide basic debugging capabilities, we extend it with utilities that can understand the semantics of LMS's data structures. We add some capabilities that allow us to locally reify values from the target process.
 
 The most basic feature the tool provides is, like any other debugger, the ability to stop the target code at any point.
 
