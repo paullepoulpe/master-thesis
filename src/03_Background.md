@@ -3,18 +3,18 @@
 ## Domain-specific languages
 > "A domain-specific language (DSL) is a small, usually declarative, language that offers expressive power focused on a particular problem domain." [@dslhudak]
 
-A DSL, as opposed to a general purpose language, provides higher level semantics and restrictions to the programmer. Compilers can take advantage of that semantic information to perform domain-specific optimizations. High level operations also give more freedom to choose different implementations depending on the specificity of the hardware target [@dsls].
+A DSL, as opposed to a general-purpose language, provides higher level semantics and restrictions to the programmer. Compilers can take advantage of that semantic information to perform domain-specific optimizations. High level operations also give more freedom to choose different implementations depending on the specificity of the hardware target [@dsls].
 
 
 ## Staging
 
-Staging is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. It splits computations into stages distinguished from one another by frequency of execution or availability of data. This allows evaluating part of the computations early or reducing frequency of execution of other parts. 
+Staging is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. It splits computations into stages distinguished from one another by frequency of execution or availability of data. This allows for the evaluation of part of the computations early or the reduction of the frequency of execution of other parts. 
 
-Due to its ability to strip abstraction and generate highly efficient code, staging is especially well suited for performance oriented DSL compilation.
+Due to its ability to strip abstraction and generate highly efficient code, staging is especially well-suited for performance-oriented DSL compilation.
 
 ## Parallel patterns
 
-Design patterns are a well understood concept in software engineering [@designpatterns]. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, they express structured computations in a parallel setting. Among the best known frameworks that use this kind of pattern are `MapReduce` [@mapreduce] and Spark [@spark].
+Design patterns are a well understood concept in software engineering [@designpatterns]. They represent a general repeatable solution to a commonly occurring problem. More broadly, they allow programmers to encapsulate semantics about some repeating structured computation. Parallel patterns are no exception, as they express structured computations in a parallel setting. Among the best-known frameworks that use this kind of pattern are `MapReduce` [@mapreduce] and Spark [@spark].
 
 Delite [@delite] uses the `MultiLoop` (also called Delite `MultiLoop`language, or DMLL) formalism [@optistructs] [@eatperf]. Each `MultiLoop` is used to define how collections of elements are composed and transformed. There are four operations defined at the core of the `MultiLoop` language: 
 
@@ -50,7 +50,7 @@ for(i <- 0 until s){
 ```
 ## Optimizations
 
-The DMLL formalism can be used to express a large number of parallel patterns from a small well defined core. This allows us to define general transformations and optimizations in a simple and concise way such that they will apply to any pattern that uses this core. In this section we present three important transformations that are part of the Delite compilation pipeline: `ArrayOfStruct` to `StructOfArray`, vertical loop fusion and horizontal loop fusion. These transformations are not new ideas [@soa] [@loopfusion], however, they are essential in the context of Delite. They can remove dependencies between elements of structured data as well as combine computations under the same scope to enable further optimizations.
+The DMLL formalism can be used to express a large number of parallel patterns from a small well-defined core. This allows us to define general transformations and optimizations in a simple and concise way such that they will apply to any pattern that uses this core. In this section we present three important transformations that are part of the Delite compilation pipeline: `ArrayOfStruct` to `StructOfArray`, vertical loop fusion and horizontal loop fusion. These transformations are not new ideas [@soa] [@loopfusion], however, they are essential in the context of Delite. They can remove dependencies between elements of structured data as well as combine computations under the same scope to enable further optimizations.
 
 We will use the following snippet of code to illustrate the different transformations a program goes through.
 
@@ -68,16 +68,16 @@ val query1 = population.Select(_.height)
 val query2 = population.Where(_.age > 40).Select(_.height)
 ```
 
-We define some structure data to represent the model we are working with, in this case a record representing a person. We then load a collection of those records from some disk storage abstraction . Finally, we have two statements that query this collection to compute some result.
+We define some structure data to represent the model we are working with, in this case a record representing a person. We then load a collection of those records from some disk storage abstraction. Finally, we have two statements that query this collection to compute some result.
 
-The first thing we can notice is that the name field in the `PersonRecord` is never read by the query. In the naive implementation however, these fields still get loaded from disk, parsed and carried around until they are discarded by the `Select` clause. This creates a computation and memory overhead that might not be negligible, especially if the size of the `name` field is significantly larger than the few bytes required to represent the other two fields.
+The first thing we can notice is that the name field in the `PersonRecord` is never read by the query. In the naive implementation however, these fields still get loaded from disk, parsed and carried around until they are discarded by the `Select` clause. This creates a computational and memory overhead that might not be negligible, especially if the size of the `name` field is significantly larger than the few bytes required to represent the other two fields.
 
 ### `ArrayOfStruct` to `StructofArray`
-High level data structures are an essential part of modern programming. Whether designed for functional, imperative or object oriented programming, every language has a mechanism to create complex data structures by grouping simpler ones (`C++`'s `struct`, `Java`'s `class`, `haskell`'s `Product` type). This very useful abstraction can however get in the way of compiler optimizations as it introduces some dependencies between parts of data.
+High-level data-structures are an essential part of modern programming. Whether designed for functional, imperative or object-oriented programming, every language has a mechanism to create complex data structures by grouping simpler ones (`C++`'s `struct`, `Java`'s `class`, `haskell`'s `Product` type). However, this very useful abstraction can get in the way of compiler optimizations as it introduces some dependencies between parts of data.
 
-Understanding the structure of the data allows the compiler to reduce its cost at runtime. If the type on an object is known at compile time, we can statically determine the target of a field access and potentially inline the code generating it. If the resulting code contains no reference to the original structure, we can safely eliminate it.
+Understanding the structure of the data allows the compiler to reduce its cost at runtime. If the type of an object is known at compile time, we can statically determine the target of a field access and potentially inline the code generating it. If the resulting code contains no reference to the original structure, we can safely eliminate it.
 
-`ArrayOfStruct` to `StructOfArray` (`AoS` to `SoA`) or `MultiLoop` `SoA` is an extension of the mechanism described above that works on a collection of `Records`. The transformation iterates over all of the patterns that produce a collection of structures and rewrites them to produce a single structure of collections, each one corresponding to a field in the original structure. It then marks the result to keep track of the transformation and rewrites the original collection's methods to work on the result of the transformation. Using the same mechanism as described above, it can rewrite accesses to the `SoA` representation by statically dispatching them.
+`ArrayOfStruct` to `StructOfArray` (`AoS` to `SoA`) or `MultiLoop` `SoA` is an extension of the mechanism described above that works on a collection of `Records`. The transformation iterates over all of the patterns that produce a collection of structures and rewrites them to produce a single structure of collections, each one corresponding to a field in the original structure. It then marks the result to keep track of the transformation, and rewrites the original collection's methods to work on the result of the transformation. Using the same mechanism as described above, it can rewrite accesses to the `SoA` representation by statically dispatching them.
 
 Ignoring the second query from the example above, the transformation's result would look something like the following.
 
@@ -103,7 +103,7 @@ Since the `population` variable is not referenced anywhere in the resulting code
 
 ### Vertical Loop Fusion
 
-Functional style programming has many advantages. It is easier to reason about independent and composable operations than explicit imperative loops. However, naive implementations of these operations can be very inefficient as they create a large amount of intermediate collections.
+Functional-style programming has many advantages. It is easier to reason about independent and composable operations than explicit imperative loops. However, naive implementations of these operations can be very inefficient, as they create a large amount of intermediate collections.
 
 Using the second query from our example, we can see that the collection that is being produced by the `Where` clause and consumed by the `Select` is never referenced anywhere else in the code. In these conditions, vertical fusion can merge the body of the producer into the consumer, and thus get rid of the intermediate structure in its entirety. 
 
@@ -139,7 +139,7 @@ The result of vertical fusion on the second query would thus look like this
 val query2 = Collect(100)(i => ages(i) > 40)(i => heights(i))
 ```
 
-All of the dependencies to the `SoA` structure have been removed, and the `names` collection can be safely removed from generated code.
+All of the dependencies to the `SoA` structure have been removed, and the `names` collection can be safely removed from the generated code.
 
 ### Horizontal Loop Fusion
 The problem with the previous two optimizations alone is that now we have a potentially large number of loops that might be duplicating computation. If the elements of the original array shared some code, now this code is duplicated across all of the loops.
@@ -152,7 +152,7 @@ val population: Coll[PersonRecord] = Array.fill(100) { i =>
     genPerson(i)
 }
 ```
-Would be transformed in quite inefficient by the `SoA` transformer if the `genPerson` function is not inlined:
+would be transformed to be quite inefficient by the `SoA` transformer if the `genPerson` function is not inlined.
 
 ```scala
 val names: Coll[String] = Array.fill(100){i => genPerson(i).name}
