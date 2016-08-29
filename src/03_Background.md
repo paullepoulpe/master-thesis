@@ -6,12 +6,11 @@
 A DSL, as opposed to a general purpose language, provides higher level semantics and restrictions to the programmer. Compilers can take advantage of that semantic information to perform domain-specific optimizations. High level operations also give more freedom to choose different implementations depending on the specificity of the hardware target [@dsls].
 
 
-## Multi-stage programming
+## Staging
 
-**[mano] MSP doesn't do any of that! it just makes it possible to spec stuff**
-Multi stage-programming (MSP), or dynamic code generation, is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. MSP splits computations into stages distinguished from one another by frequency of execution or availability of data. This allows evaluating part of the computations early or reducing frequency of execution of other parts. 
+Staging is a mechanism that can be used to remove abstraction overhead and efficiently specialize generic programs. It splits computations into stages distinguished from one another by frequency of execution or availability of data. This allows evaluating part of the computations early or reducing frequency of execution of other parts. 
 
-Due to its ability to strip abstraction and generate highly efficient code, MSP is especially well suited for performance oriented DSL compilation.
+Due to its ability to strip abstraction and generate highly efficient code, staging is especially well suited for performance oriented DSL compilation.
 
 ## Parallel patterns
 
