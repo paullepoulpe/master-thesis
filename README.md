@@ -70,4 +70,4 @@ All of the files are located in the `src` folder. They have to be ordered by nam
 The `templates` folder contains the latex templates that are included before generating the pdf. Theses include a template that makes sure a new page is allocated every time a section starts as well as the template that creates the title page. `templates/computer.csl` defines the citation style in the resulting document.
 
 ## Bugs
-Pandoc does not like backslashes in image urls, so for now the plots are not generated using [markdown-tech](https://markdown.tech), but have their separate compiation folder.
+Pandoc does not like backslashes in image urls, so for now the plots are not generated using [markdown-tech](https://markdown.tech), but have their separate compilation folder.
