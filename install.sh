@@ -17,10 +17,10 @@ function installed(){
 # Package manager
 installed brew || /usr/bin/ruby -e \
   "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
-brew update && brew upgrade
+brew update && brew upgrade && brew tap caskroom/cask
 
 # Markdonw to latex
-installed pandoc || brew install pandoc
+installed pandoc || (brew install pandoc && brew install pandoc-citeproc)
 
 # Latex compilation
 installed pdflatex || brew cask install mactex
