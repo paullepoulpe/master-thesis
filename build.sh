@@ -70,7 +70,8 @@ for idx in "${!outputs[@]}"; do
   # Update all the links to be pdf instead of png
   cat build/thesis_raw.md | \
     sed -e "s|/g/png|/g/pdf|g" |\
-    sed -e "s|../plots/out/\(.*\)\.png|plots/out/\1|g" \
+    sed -e "s|../plots/out/\(.*\)\.png|plots/out/\1|g" |\
+    sed -e "s|../images/\(.*\)|images/\1|g" \
     > build/thesis.md
 
   echo -n "Compiling thesis to $outfile ($format) ..."
